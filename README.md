@@ -1,7 +1,8 @@
-=====================================================
+
 UNDERWHELMING MULTIPLE FOLLOWERS
+===============
 By larsepan
-=====================================================
+
 
 This mod has served as a helpful foundation for
 other projects.  I figured if I polished it up, 
@@ -12,7 +13,7 @@ Happy adventuring,
 
 
 LOG
-=====================================================
+===============
 2019.5.13 - 1.0
 -Release
 2019.5.14 - 1.0.1
