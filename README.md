@@ -4,9 +4,9 @@ UNDERWHELMING MULTIPLE FOLLOWERS
 By larsepan
 
 
-This mod has served as a helpful foundation for
+This mod originally served as a helpful foundation for
 other projects.  I figured if I polished it up, 
-maybe somebody else might like its simplicity.
+maybe somebody else might find it useful.
 
 Happy adventuring,
 -Larsepan
