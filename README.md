@@ -16,6 +16,11 @@ LOG
 ===============
 2019.X.X
 
+2019.5.22 - 1.2.0
+-Animal followers max should now be 3.
+-Replaced technical notifications with minimal ones.
+-Code cleanup and fixes.
+
 2019.5.19 - 1.1.1
 -Menu improvements to both spell and MCM.
 -Added toggle for follower ride assist.
