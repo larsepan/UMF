@@ -16,6 +16,10 @@ LOG
 ===============
 2019.X.X
 
+2019.5.25 - v1.2.1
+-USSEP updates to code
+-code clean-up and optimization
+
 2019.5.22 - 1.2.0
 -Animal followers max should now be 3.
 -Replaced technical notifications with minimal ones.
