@@ -16,6 +16,11 @@ LOG
 ===============
 2019.X.X
 
+2019.5.29 - v1.3.0
+-Support for all DLC
+-Added hide-able Commands menu
+-cleaning and optimization
+
 2019.5.25 - v1.2.1
 -USSEP updates to code
 -code clean-up and optimization
