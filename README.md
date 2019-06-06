@@ -14,7 +14,13 @@ Happy adventuring,
 
 LOG
 ===============
-2019.X.X
+2019.6.4 - v1.4.0
+-Improved follower to follower relationship
+-Added "Ignore Friendly Fire" toggle
+-Added "Stop" and "Dismiss" to commands
+-Added Idle movements toggle for followers
+-Reorganized Menu system - Removed Command (hide) toggle
+-General Fixes
 
 2019.5.30 - v1.3.1
 -DLC bugfixes
