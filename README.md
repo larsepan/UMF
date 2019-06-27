@@ -14,6 +14,33 @@ Happy adventuring,
 
 LOG
 ===============
+2019.6.25 - v1.4.4
+-Improved Lively control: For followers to relax at home or an inn now requires the player to remove their helmet/hood.
+-Improved conditions for Lively.
+-Fixed animals staying in a waiting state after dismissal.
+-General improvements.
+
+2019.6.23 - v1.4.3
+-Changed command "Stop" to "Check"
+-"Check" summons wayward followers in addition to stopping follower vs follower fights
+-Overhauled follower "follow" command to consider distance
+-Improved Lively idles - particularly in homes and inns
+-Improved follower travel between cells/fast travel
+-Followers will wait indefinitely now (as opposed to only 3 days)
+-General fixes/clean up
+
+2019.6.10 - v1.4.2
+-General bug fixes and cleanup.
+
+2019.6.6 - v1.4.1b
+Hotfix. Fixed bug that was an issue in 1.4 and 1.4.1 - (empty properties)
+
+2019.6.6 - v1.4.1
+-Made UMF Config spell less spell like and more command like
+-Slight change to Lively AI Package
+-Changed menu option "Fixes" to "Help" and added "Info"
+-General fixes
+
 2019.6.4 - v1.4.0
 -Improved follower to follower relationship
 -Added "Ignore Friendly Fire" toggle
