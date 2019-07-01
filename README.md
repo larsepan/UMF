@@ -14,6 +14,14 @@ Happy adventuring,
 
 LOG
 ===============
+2019.6.28 - v1.5.0
+-Many under-the-hood MCM changes. If you're using the MCM menu, it will take a few moments to install the new UMF Menu.
+-Added translation infrastructure to MCM.
+-Added command hotkeys to MCM.
+-Updated Lively to have OFF, ON, and ON(headgear) settings.
+-Rolled back Wait change to the original vanilla 3 days.
+-Many general improvements and fixes.
+
 2019.6.25 - v1.4.4
 -Improved Lively control: For followers to relax at home or an inn now requires the player to remove their helmet/hood.
 -Improved conditions for Lively.
