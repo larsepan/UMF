@@ -14,6 +14,12 @@ Happy adventuring,
 
 LOG
 ===============
+2019.7.2 - v1.5.1(v1.5.1a)
+-Fixed MCM translations issue.
+-Improved lively in taverns/home.
+-Released USSEP Patch.
+-General fixes.
+
 2019.6.28 - v1.5.0
 -Many under-the-hood MCM changes. If you're using the MCM menu, it will take a few moments to install the new UMF Menu.
 -Added translation infrastructure to MCM.
