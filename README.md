@@ -14,6 +14,12 @@ Happy adventuring,
 
 LOG
 ===============
+2019.7.5 - v1.5.2
+-Improved followers following the player through doors.
+-Lively Tavern/Home followers will get ready to go, if the player stands next to the exit.
+-Fixed Blades recruitment. The order of recruitment: Followers who are not waiting will be recruited first. If all followers are not waiting or all followers are waiting, a random follower will be recruited.
+-Changed "Your followers cannot accompany you here" to "Perhaps I should have my companions wait outside..."
+
 2019.7.2 - v1.5.1(v1.5.1a)
 -Fixed MCM translations issue.
 -Improved lively in taverns/home.
