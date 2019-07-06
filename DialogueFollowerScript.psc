@@ -493,9 +493,9 @@ EndFunction
 
 Function DismissFollower(Int iMessage = 0, Int iSayLine = 1) 
 
-	;Assigning a Blade will call this function
-	;This function will be called by the commands menu
+	;I'm not sure how often this failsafe function will be called by the vanilla game
 	;It also might be called by a custom follower
+	;This function will dismiss the first alias that is not waiting
 	actor refActor1 = pFollowerAlias.GetReference() as actor
 	actor refActor2 = pFollowerAlias2.GetReference() as actor
 	actor refActor3 = pFollowerAlias3.GetReference() as actor
@@ -504,131 +504,221 @@ Function DismissFollower(Int iMessage = 0, Int iSayLine = 1)
 	float ignoreCheck = gFriendAgg.GetValue()
 	float notif = gNotif.GetValue()
 	int iCount
+	int iDismiss
+	bool bDismiss = true
 	
 	if (refActor1 != none)
-	iCount += 1
+		if (refActor1.GetActorValue("WaitingforPlayer") == 0)
+			DismissedFollowerActor = refActor1
+			iDismiss = 1
+		endIf
+		iCount += 1
 	endIf
 	if (refActor2 != none)
-	iCount += 1
+		if (refActor2.GetActorValue("WaitingforPlayer") == 0)
+			DismissedFollowerActor = refActor2
+			iDismiss = 2
+		endIf
+		iCount += 1
 	endIf
 	if (refActor3 != none)
-	iCount += 1
-	endIf
-	if(notif == 1)
-		debug.notification("Incorrect follower may be dismissed due to default DismissFollower function.")
-	endIf
-	; pFollowerAlias should already be filled, but just in case it isn't...
-	if(refActor1 == none)
-		if(refActor2 != none)
-			pFollowerAlias2.clear()
-			DismissedFollowerActor = refActor2
-			pFollowerAlias.ForceRefTo(refActor2)
-			pFollowerAlias2.UnregisterForUpdateGameTime() 																												  
-			Utility.Wait(1)
-			;if(notif == 1)
-				;debug.notification("Follower2 alias was moved to Follower1.")
-			;endIf
-		elseif(refActor3 != none)
-			pFollowerAlias3.clear()
+		if (refActor3.GetActorValue("WaitingforPlayer") == 0)
 			DismissedFollowerActor = refActor3
-			pFollowerAlias.ForceRefTo(refActor3)
-			pFollowerAlias3.UnregisterForUpdateGameTime() 																											  
-			Utility.Wait(1)
-			;if(notif == 1)
-				;debug.notification("Follower3 alias was moved to Follower1.")
-			;endIf
-		else
-			if(notif == 1)
-				debug.notification("Dismissal error: DismissFollower function found no actor for dismissal.")
-			endIf
-			Return
+			iDismiss = 3
 		endIf
+		iCount += 1
+	endIf
+	if(!iDismiss && iCount)
+		DismissedFollowerActor = refActor1
+		;All actors are waiting.  Dismissing first alias.
+	endIf
+
+	if(iDismiss == 1)
+		If pFollowerAlias && pFollowerAlias.GetActorReference().IsDead() == False
+			If iMessage == 0
+				FollowerDismissMessage.Show()
+			ElseIf iMessage == 1
+				FollowerDismissMessageWedding.Show()
+			ElseIf iMessage == 2
+				FollowerDismissMessageCompanions.Show()
+			ElseIf iMessage == 3
+				FollowerDismissMessageCompanionsMale.Show()
+			ElseIf iMessage == 4
+				FollowerDismissMessageCompanionsFemale.Show()
+			ElseIf iMessage == 5
+				FollowerDismissMessageWait.Show()
+			Else
+				;failsafe
+				FollowerDismissMessage.Show()
+			EndIf
+			pFollowerAlias.UnregisterForUpdateGameTime() 																												  
+			DismissedFollowerActor.StopCombatAlarm()
+			DismissedFollowerActor.AddToFaction(pDismissedFollower)
+			DismissedFollowerActor.SetPlayerTeammate(false)
+			DismissedFollowerActor.RemoveFromFaction(pCurrentHireling)
+			DismissedFollowerActor.SetActorValue("WaitingForPlayer", 0)
+
+			; PATCH 1.9: 77615: remove unplayable hunting bow when follower is dismissed
+			DismissedFollowerActor.RemoveItem(FollowerHuntingBow, 999, true)
+			DismissedFollowerActor.RemoveItem(FollowerIronArrow, 999, true)
+			; END Patch 1.9 fix
+
+			;hireling rehire function
+			HirelingRehireScript.DismissHireling(DismissedFollowerActor.GetActorBase())
+			If iSayLine == 1
+				iFollowerDismiss = 1
+				DismissedFollowerActor.EvaluatePackage()
+				;Wait for follower to say line
+				Utility.Wait(2)
+			EndIf
+
+			pFollowerAlias.Clear()
+			iFollowerDismiss = 0
+			;don't set count to 0 if Companions have replaced follower
+			If iMessage == 2
+				bDismiss == false
+			EndIf
+			
+			;If possible, refill that first alias
+			if(refActor2 != none)
+				Utility.Wait(1)
+				pFollowerAlias2.Clear()
+				pFollowerAlias.ForceRefTo(refActor2)
+				pFollowerAlias2.UnregisterForUpdateGameTime() 	
+				;if(notif == 1)
+					;debug.notification("Follower1 alias cleared and replaced by Follower2 alias.")
+				;endIf
+				LarsepanCorrectFollowers()
+			elseIf(refActor3 != none)
+				Utility.Wait(1)
+				pFollowerAlias3.Clear()
+				pFollowerAlias.ForceRefTo(refActor3)
+				pFollowerAlias3.UnregisterForUpdateGameTime() 	
+				;if(notif == 1)
+					;debug.notification("Follower1 alias cleared and replaced by Follower3 alias.")
+				;endIf
+				LarsepanCorrectFollowers()
+			else
+				;the player has no followers
+			endIf
+		EndIf
+	elseIf(iDismiss == 2)
+		If pFollowerAlias2 && pFollowerAlias2.GetActorReference().IsDead() == False
+			If iMessage == 0
+				FollowerDismissMessage.Show()
+			ElseIf iMessage == 1
+				FollowerDismissMessageWedding.Show()
+			ElseIf iMessage == 2
+				FollowerDismissMessageCompanions.Show()
+			ElseIf iMessage == 3
+				FollowerDismissMessageCompanionsMale.Show()
+			ElseIf iMessage == 4
+				FollowerDismissMessageCompanionsFemale.Show()
+			ElseIf iMessage == 5
+				FollowerDismissMessageWait.Show()
+			Else
+				;failsafe
+				FollowerDismissMessage.Show()
+			EndIf
+			pFollowerAlias2.UnregisterForUpdateGameTime() 																												  
+			DismissedFollowerActor.StopCombatAlarm()
+			DismissedFollowerActor.AddToFaction(pDismissedFollower)
+			DismissedFollowerActor.SetPlayerTeammate(false)
+			DismissedFollowerActor.RemoveFromFaction(pCurrentHireling)
+			DismissedFollowerActor.SetActorValue("WaitingForPlayer", 0)
+
+			; PATCH 1.9: 77615: remove unplayable hunting bow when follower is dismissed
+			DismissedFollowerActor.RemoveItem(FollowerHuntingBow, 999, true)
+			DismissedFollowerActor.RemoveItem(FollowerIronArrow, 999, true)
+			; END Patch 1.9 fix
+
+			;hireling rehire function
+			HirelingRehireScript.DismissHireling(DismissedFollowerActor.GetActorBase())
+			If iSayLine == 1
+				iFollowerDismiss = 1
+				DismissedFollowerActor.EvaluatePackage()
+				;Wait for follower to say line
+				Utility.Wait(2)
+			EndIf
+
+			pFollowerAlias2.Clear()
+			iFollowerDismiss = 0
+			;don't set count to 0 if Companions have replaced follower
+			If iMessage == 2
+				bDismiss == false
+			EndIf
+		EndIf
+	
+	elseIf(iDismiss == 3)
+		If pFollowerAlias3 && pFollowerAlias3.GetActorReference().IsDead() == False
+			If iMessage == 0
+				FollowerDismissMessage.Show()
+			ElseIf iMessage == 1
+				FollowerDismissMessageWedding.Show()
+			ElseIf iMessage == 2
+				FollowerDismissMessageCompanions.Show()
+			ElseIf iMessage == 3
+				FollowerDismissMessageCompanionsMale.Show()
+			ElseIf iMessage == 4
+				FollowerDismissMessageCompanionsFemale.Show()
+			ElseIf iMessage == 5
+				FollowerDismissMessageWait.Show()
+			Else
+				;failsafe
+				FollowerDismissMessage.Show()
+			EndIf
+			pFollowerAlias3.UnregisterForUpdateGameTime() 																												  
+			DismissedFollowerActor.StopCombatAlarm()
+			DismissedFollowerActor.AddToFaction(pDismissedFollower)
+			DismissedFollowerActor.SetPlayerTeammate(false)
+			DismissedFollowerActor.RemoveFromFaction(pCurrentHireling)
+			DismissedFollowerActor.SetActorValue("WaitingForPlayer", 0)
+
+			; PATCH 1.9: 77615: remove unplayable hunting bow when follower is dismissed
+			DismissedFollowerActor.RemoveItem(FollowerHuntingBow, 999, true)
+			DismissedFollowerActor.RemoveItem(FollowerIronArrow, 999, true)
+			; END Patch 1.9 fix
+
+			;hireling rehire function
+			HirelingRehireScript.DismissHireling(DismissedFollowerActor.GetActorBase())
+			If iSayLine == 1
+				iFollowerDismiss = 1
+				DismissedFollowerActor.EvaluatePackage()
+				;Wait for follower to say line
+				Utility.Wait(2)
+			EndIf
+
+			pFollowerAlias3.Clear()
+			iFollowerDismiss = 0
+			;don't set count to 0 if Companions have replaced follower
+			If iMessage == 2
+				bDismiss == false
+			EndIf
+		EndIf
+	else
+		;debug.notification("Player has no followers to dismiss.")
+		Return
 	endIf
 	
-	If pFollowerAlias && pFollowerAlias.GetActorReference().IsDead() == False
-		If iMessage == 0
-			FollowerDismissMessage.Show()
-		ElseIf iMessage == 1
-			FollowerDismissMessageWedding.Show()
-		ElseIf iMessage == 2
-			FollowerDismissMessageCompanions.Show()
-		ElseIf iMessage == 3
-			FollowerDismissMessageCompanionsMale.Show()
-		ElseIf iMessage == 4
-			FollowerDismissMessageCompanionsFemale.Show()
-		ElseIf iMessage == 5
-			FollowerDismissMessageWait.Show()
-		Else
-			;failsafe
-			FollowerDismissMessage.Show()
-		EndIf
-		pFollowerAlias.UnregisterForUpdateGameTime() 																												  
-		DismissedFollowerActor.StopCombatAlarm()
-		DismissedFollowerActor.AddToFaction(pDismissedFollower)
-		DismissedFollowerActor.SetPlayerTeammate(false)
-		DismissedFollowerActor.RemoveFromFaction(pCurrentHireling)
-		DismissedFollowerActor.SetActorValue("WaitingForPlayer", 0)
-
-		; PATCH 1.9: 77615: remove unplayable hunting bow when follower is dismissed
-		DismissedFollowerActor.RemoveItem(FollowerHuntingBow, 999, true)
-		DismissedFollowerActor.RemoveItem(FollowerIronArrow, 999, true)
-		; END Patch 1.9 fix
-
-		;hireling rehire function
-		HirelingRehireScript.DismissHireling(DismissedFollowerActor.GetActorBase())
-		If iSayLine == 1
-			iFollowerDismiss = 1
-			DismissedFollowerActor.EvaluatePackage()
-			;Wait for follower to say line
-			Utility.Wait(2)
-		EndIf
-
-		pFollowerAlias.Clear()
-		iFollowerDismiss = 0
-		;don't set count to 0 if Companions have replaced follower
-		If iMessage == 2
-			;do nothing
-		Else
-			pPlayerFollowerCount.Mod(-count)				
-			iCount -=1
-			if(iCount < 1 )
-				pPlayerFollowerCount.SetValue(0) ;might as well reset the zero value
-				iCount = 0
-			else
-				pPlayerFollowerCount.Mod(iCount)
-			endIf
-			; if(notif == 1)
-				; debug.notification(iCount + "/3 followers")				
-				; ;debug.notification("PlayerFollowerCount has been set to " + iCount + ".")	
-			; endIf
-		EndIf
-	EndIf
-	refActor2 = pFollowerAlias2.GetReference() as actor
-	refActor3 = pFollowerAlias3.GetReference() as actor
-	if(refActor2 != none)
-		Utility.Wait(1)
-		pFollowerAlias2.Clear()
-		pFollowerAlias.ForceRefTo(refActor2)
-		pFollowerAlias2.UnregisterForUpdateGameTime() 	
-		;if(notif == 1)
-			;debug.notification("Follower1 alias cleared and replaced by Follower2 alias.")
-		;endIf
-		LarsepanCorrectFollowers()
-	elseIf(refActor3 != none)
-		Utility.Wait(1)
-		pFollowerAlias3.Clear()
-		pFollowerAlias.ForceRefTo(refActor3)
-		pFollowerAlias3.UnregisterForUpdateGameTime() 	
-		;if(notif == 1)
-			;debug.notification("Follower1 alias cleared and replaced by Follower3 alias.")
-		;endIf
-		LarsepanCorrectFollowers()
-	else
-		;the player has no followers
-	endIf
 	if(ignoreCheck == 1)
 		DismissedFollowerActor.IgnoreFriendlyHits(false)
 	endIf
+	
+	if(bDismiss)
+		pPlayerFollowerCount.Mod(-count)				
+		iCount -=1
+		if(iCount < 1 )
+			pPlayerFollowerCount.SetValue(0) ;might as well reset the zero value
+			iCount = 0
+		else
+			pPlayerFollowerCount.Mod(iCount)
+		endIf
+		; if(notif == 1)
+			; debug.notification(iCount + "/3 followers")				
+			; ;debug.notification("PlayerFollowerCount has been set to " + iCount + ".")	
+		; endIf
+	endIf
+	
 EndFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

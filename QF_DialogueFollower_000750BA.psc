@@ -32,6 +32,8 @@ ReferenceAlias Property Alias_Follower2 Auto
 ReferenceAlias Property Alias_Follower3 Auto
 ;END ALIAS PROPERTY
 
+quest Property AddConfigHandlers  Auto
+
 ;BEGIN FRAGMENT Fragment_13
 Function Fragment_13()
 ;BEGIN AUTOCAST TYPE HirelingCommentScript
@@ -48,7 +50,9 @@ EndFunction
 Function Fragment_4()
 ;BEGIN CODE
 ;Recruit third blade
-FreeformSkyhavenTempleA.RecruitBlade(Alias_Follower.GetActorRef() as Actor)
+;FreeformSkyhavenTempleA.RecruitBlade(Alias_Follower.GetActorRef() as Actor)
+actor refActor = (AddConfigHandlers as Larsepan_UMF_Handlers).FindReadyActor()
+FreeformSkyhavenTempleA.RecruitBlade(refActor)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -57,7 +61,8 @@ EndFunction
 Function Fragment_3()
 ;BEGIN CODE
 ;Recruit second blade
-FreeformSkyhavenTempleA.RecruitBlade(Alias_Follower.GetActorRef() as Actor)
+actor refActor = (AddConfigHandlers as Larsepan_UMF_Handlers).FindReadyActor()
+FreeformSkyhavenTempleA.RecruitBlade(refActor)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -66,7 +71,8 @@ EndFunction
 Function Fragment_0()
 ;BEGIN CODE
 ;Recruit first blade
-FreeformSkyhavenTempleA.RecruitBlade(Alias_Follower.GetActorRef() as Actor)
+actor refActor = (AddConfigHandlers as Larsepan_UMF_Handlers).FindReadyActor()
+FreeformSkyhavenTempleA.RecruitBlade(refActor)
 ;END CODE
 EndFunction
 ;END FRAGMENT

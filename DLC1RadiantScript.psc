@@ -1,7 +1,6 @@
 Scriptname DLC1RadiantScript extends Quest Conditional
 {Master script for DLC1 Radiant Quests. Attached to DLC1_Radiant quest.}
 
-GlobalVariable Property gNotif  Auto
 ReferenceAlias Property CurrentQuestGiver auto
 
 Faction Property DLC1RadiantVampireBanditNecroAllys auto
@@ -288,7 +287,6 @@ bool Function IsActorInFactionInFormlist(Actor ActorToCheck, Formlist FormlistTo
 		endif
 		count += 1
 	endwhile
-
 	RETURN FALSE
 EndFunction
 
@@ -401,9 +399,10 @@ function TrollAbandoned(Actor Troll)
 EndFunction
 
 Function TrollWait()
-
-	TrollFollower.GetActorReference().SetActorValue("WaitingForPlayer", 1)
-
+	actor troll = TrollFollower.GetReference() as actor
+	if (troll.GetActorValue("WaitingforPlayer") == 0)
+		troll.SetActorValue("WaitingForPlayer", 1)
+	endIf
 EndFunction
 
 Function TrollFollow()
