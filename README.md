@@ -14,6 +14,9 @@ Happy adventuring,
 
 LOG
 ===============
+2019.7.5 - v1.5.2a
+-Fixed hotkey follow notification bug in v1.5.2
+
 2019.7.5 - v1.5.2
 -Improved followers following the player through doors.
 -Lively Tavern/Home followers should get ready to go if the player stands next to the exit.
