@@ -14,7 +14,7 @@ Happy adventuring,
 
 LOG
 ===============
-2019.7.5 - v1.5.2a
+2019.7.29 - v1.5.2a
 -Fixed hotkey follow notification bug in v1.5.2
 
 2019.7.5 - v1.5.2
