@@ -503,12 +503,12 @@ Function HotkeyFollow(Int iMessage)
 					debug.notification("$NotifFollow4")		
 				endIf
 			endIf
-		else
-			if(!fCount && !aCount && !refTroll1)
-				debug.notification("$NotifFollow5")
-			else
-				debug.notification("$NotifFollow6")
-			endIf
+		; else
+			; if(!fCount && !aCount && !refTroll1)
+				; debug.notification("$NotifFollow5")
+			; else
+				; debug.notification("$NotifFollow6")
+			; endIf
 		endIf
 	endIf
 
