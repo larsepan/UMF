@@ -14,6 +14,9 @@ Happy adventuring,
 
 LOG
 ===============
+2019.8.3 - v1.5.2b
+-Fixed wedding dismissal bug.
+
 2019.7.29 - v1.5.2a
 -Fixed hotkey follow notification bug in v1.5.2
 
