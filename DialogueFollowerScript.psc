@@ -36,8 +36,6 @@ Int Property iFollowerDismiss Auto Conditional
 Weapon Property FollowerHuntingBow Auto
 Ammo Property FollowerIronArrow Auto
 
-int Property USKPMjollInWindhelm = 0 Auto Conditional ;from USSEP
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;SET-FOLLOWER edits
@@ -502,26 +500,25 @@ Function DismissFollower(Int iMessage = 0, Int iSayLine = 1)
 	actor DismissedFollowerActor
 	float count = pPlayerFollowerCount.GetValue()
 	float ignoreCheck = gFriendAgg.GetValue()
-	float notif = gNotif.GetValue()
+	;float notif = gNotif.GetValue()
 	int iCount
 	int iDismiss
-	bool bDismiss = true
 	
-	if (refActor1 != none)
+	if (refActor1)
 		if (refActor1.GetActorValue("WaitingforPlayer") == 0)
 			DismissedFollowerActor = refActor1
 			iDismiss = 1
 		endIf
 		iCount += 1
 	endIf
-	if (refActor2 != none)
+	if (refActor2)
 		if (refActor2.GetActorValue("WaitingforPlayer") == 0)
 			DismissedFollowerActor = refActor2
 			iDismiss = 2
 		endIf
 		iCount += 1
 	endIf
-	if (refActor3 != none)
+	if (refActor3)
 		if (refActor3.GetActorValue("WaitingforPlayer") == 0)
 			DismissedFollowerActor = refActor3
 			iDismiss = 3
@@ -533,8 +530,8 @@ Function DismissFollower(Int iMessage = 0, Int iSayLine = 1)
 		;All actors are waiting.  Dismissing first alias.
 	endIf
 
-	if(iDismiss == 1)
-		If pFollowerAlias && pFollowerAlias.GetActorReference().IsDead() == False
+	if(iCount)
+		If DismissedFollowerActor && DismissedFollowerActor.IsDead() == False
 			If iMessage == 0
 				FollowerDismissMessage.Show()
 			ElseIf iMessage == 1
@@ -551,7 +548,7 @@ Function DismissFollower(Int iMessage = 0, Int iSayLine = 1)
 				;failsafe
 				FollowerDismissMessage.Show()
 			EndIf
-			pFollowerAlias.UnregisterForUpdateGameTime() 																												  
+
 			DismissedFollowerActor.StopCombatAlarm()
 			DismissedFollowerActor.AddToFaction(pDismissedFollower)
 			DismissedFollowerActor.SetPlayerTeammate(false)
@@ -571,272 +568,96 @@ Function DismissFollower(Int iMessage = 0, Int iSayLine = 1)
 				;Wait for follower to say line
 				Utility.Wait(2)
 			EndIf
-
-			pFollowerAlias.Clear()
-			iFollowerDismiss = 0
-			;don't set count to 0 if Companions have replaced follower
-			If iMessage == 2
-				bDismiss == false
-			EndIf
-			
-			;If possible, refill that first alias
-			if(refActor2 != none)
-				Utility.Wait(1)
+			if(iDismiss == 1)
+				pFollowerAlias.UnregisterForUpdateGameTime()
+				pFollowerAlias.Clear()
+				;If possible, refill that first alias
+				if(refActor2 != none)
+					Utility.Wait(1)
+					pFollowerAlias2.Clear()
+					pFollowerAlias.ForceRefTo(refActor2)
+					pFollowerAlias2.UnregisterForUpdateGameTime() 	
+					;if(notif == 1)
+						;debug.notification("Follower1 alias cleared and replaced by Follower2 alias.")
+					;endIf
+					LarsepanCorrectFollowers()
+				elseIf(refActor3 != none)
+					Utility.Wait(1)
+					pFollowerAlias3.Clear()
+					pFollowerAlias.ForceRefTo(refActor3)
+					pFollowerAlias3.UnregisterForUpdateGameTime() 	
+					;if(notif == 1)
+						;debug.notification("Follower1 alias cleared and replaced by Follower3 alias.")
+					;endIf
+					LarsepanCorrectFollowers()
+				else
+					;the player has no followers
+				endIf
+			elseIf(iDismiss == 2)
+				pFollowerAlias2.UnregisterForUpdateGameTime() 
 				pFollowerAlias2.Clear()
-				pFollowerAlias.ForceRefTo(refActor2)
-				pFollowerAlias2.UnregisterForUpdateGameTime() 	
-				;if(notif == 1)
-					;debug.notification("Follower1 alias cleared and replaced by Follower2 alias.")
-				;endIf
-				LarsepanCorrectFollowers()
-			elseIf(refActor3 != none)
-				Utility.Wait(1)
-				pFollowerAlias3.Clear()
-				pFollowerAlias.ForceRefTo(refActor3)
-				pFollowerAlias3.UnregisterForUpdateGameTime() 	
-				;if(notif == 1)
-					;debug.notification("Follower1 alias cleared and replaced by Follower3 alias.")
-				;endIf
-				LarsepanCorrectFollowers()
 			else
-				;the player has no followers
+				pFollowerAlias3.UnregisterForUpdateGameTime() 
+				pFollowerAlias3.Clear()
 			endIf
-		EndIf
-	elseIf(iDismiss == 2)
-		If pFollowerAlias2 && pFollowerAlias2.GetActorReference().IsDead() == False
-			If iMessage == 0
-				FollowerDismissMessage.Show()
-			ElseIf iMessage == 1
-				FollowerDismissMessageWedding.Show()
-			ElseIf iMessage == 2
-				FollowerDismissMessageCompanions.Show()
-			ElseIf iMessage == 3
-				FollowerDismissMessageCompanionsMale.Show()
-			ElseIf iMessage == 4
-				FollowerDismissMessageCompanionsFemale.Show()
-			ElseIf iMessage == 5
-				FollowerDismissMessageWait.Show()
-			Else
-				;failsafe
-				FollowerDismissMessage.Show()
-			EndIf
-			pFollowerAlias2.UnregisterForUpdateGameTime() 																												  
-			DismissedFollowerActor.StopCombatAlarm()
-			DismissedFollowerActor.AddToFaction(pDismissedFollower)
-			DismissedFollowerActor.SetPlayerTeammate(false)
-			DismissedFollowerActor.RemoveFromFaction(pCurrentHireling)
-			DismissedFollowerActor.SetActorValue("WaitingForPlayer", 0)
 
-			; PATCH 1.9: 77615: remove unplayable hunting bow when follower is dismissed
-			DismissedFollowerActor.RemoveItem(FollowerHuntingBow, 999, true)
-			DismissedFollowerActor.RemoveItem(FollowerIronArrow, 999, true)
-			; END Patch 1.9 fix
-
-			;hireling rehire function
-			HirelingRehireScript.DismissHireling(DismissedFollowerActor.GetActorBase())
-			If iSayLine == 1
-				iFollowerDismiss = 1
-				DismissedFollowerActor.EvaluatePackage()
-				;Wait for follower to say line
-				Utility.Wait(2)
-			EndIf
-
-			pFollowerAlias2.Clear()
 			iFollowerDismiss = 0
-			;don't set count to 0 if Companions have replaced follower
+
 			If iMessage == 2
-				bDismiss == false
+				;don't adjust count if Companions have replaced follower
+			else
+				pPlayerFollowerCount.Mod(-count)				
+				iCount -=1
+				if(iCount < 1 )
+					pPlayerFollowerCount.SetValue(0) ;might as well reset the zero value
+					iCount = 0
+				else
+					pPlayerFollowerCount.Mod(iCount)
+				endIf
+				; if(notif == 1)
+					; debug.notification(iCount + "/3 followers")				
+					; ;debug.notification("PlayerFollowerCount has been set to " + iCount + ".")	
+				; endIf
 			EndIf
-		EndIf
-	
-	elseIf(iDismiss == 3)
-		If pFollowerAlias3 && pFollowerAlias3.GetActorReference().IsDead() == False
-			If iMessage == 0
-				FollowerDismissMessage.Show()
-			ElseIf iMessage == 1
-				FollowerDismissMessageWedding.Show()
-			ElseIf iMessage == 2
-				FollowerDismissMessageCompanions.Show()
-			ElseIf iMessage == 3
-				FollowerDismissMessageCompanionsMale.Show()
-			ElseIf iMessage == 4
-				FollowerDismissMessageCompanionsFemale.Show()
-			ElseIf iMessage == 5
-				FollowerDismissMessageWait.Show()
-			Else
-				;failsafe
-				FollowerDismissMessage.Show()
-			EndIf
-			pFollowerAlias3.UnregisterForUpdateGameTime() 																												  
-			DismissedFollowerActor.StopCombatAlarm()
-			DismissedFollowerActor.AddToFaction(pDismissedFollower)
-			DismissedFollowerActor.SetPlayerTeammate(false)
-			DismissedFollowerActor.RemoveFromFaction(pCurrentHireling)
-			DismissedFollowerActor.SetActorValue("WaitingForPlayer", 0)
-
-			; PATCH 1.9: 77615: remove unplayable hunting bow when follower is dismissed
-			DismissedFollowerActor.RemoveItem(FollowerHuntingBow, 999, true)
-			DismissedFollowerActor.RemoveItem(FollowerIronArrow, 999, true)
-			; END Patch 1.9 fix
-
-			;hireling rehire function
-			HirelingRehireScript.DismissHireling(DismissedFollowerActor.GetActorBase())
-			If iSayLine == 1
-				iFollowerDismiss = 1
-				DismissedFollowerActor.EvaluatePackage()
-				;Wait for follower to say line
-				Utility.Wait(2)
-			EndIf
-
-			pFollowerAlias3.Clear()
-			iFollowerDismiss = 0
-			;don't set count to 0 if Companions have replaced follower
-			If iMessage == 2
-				bDismiss == false
-			EndIf
-		EndIf
+			if(ignoreCheck == 1)
+				DismissedFollowerActor.IgnoreFriendlyHits(false)
+			endIf
+		EndIf		
 	else
 		;debug.notification("Player has no followers to dismiss.")
-		Return
 	endIf
-	
-	if(ignoreCheck == 1)
-		DismissedFollowerActor.IgnoreFriendlyHits(false)
-	endIf
-	
-	if(bDismiss)
-		pPlayerFollowerCount.Mod(-count)				
-		iCount -=1
-		if(iCount < 1 )
-			pPlayerFollowerCount.SetValue(0) ;might as well reset the zero value
-			iCount = 0
-		else
-			pPlayerFollowerCount.Mod(iCount)
-		endIf
-		; if(notif == 1)
-			; debug.notification(iCount + "/3 followers")				
-			; ;debug.notification("PlayerFollowerCount has been set to " + iCount + ".")	
-		; endIf
-	endIf
-	
+
 EndFunction
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;LarsepanDismissFollower
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Function LarsepanDismissFollower(Int iMessage = 0, Int iSayLine = 1, ObjectReference FollowerRef)
-
-	actor refActor1 = pFollowerAlias.GetReference() as actor
-	actor refActor2 = pFollowerAlias2.GetReference() as actor
-	actor refActor3 = pFollowerAlias3.GetReference() as actor
+	
 	actor DismissedFollowerActor = FollowerRef as actor
-	float notif = gNotif.GetValue()
-	float count = pPlayerFollowerCount.GetValue()
-	float ignoreCheck = gFriendAgg.GetValue()
-	int iCount
-	if (refActor1 != none)
-	iCount += 1
-	endIf
-	if (refActor2 != none)
-	iCount += 1
-	endIf
-	if (refActor3 != none)
-	iCount += 1
-	endIf
-	if(ignoreCheck == 1)
-		DismissedFollowerActor.IgnoreFriendlyHits(false)
-	endIf
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;alias1
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	if(DismissedFollowerActor == refActor1)
-		If (refActor1.IsDead() == False)
-			If iMessage == 0
-				FollowerDismissMessage.Show()
-			ElseIf iMessage == 1
-				FollowerDismissMessageWedding.Show()
-			ElseIf iMessage == 2
-				FollowerDismissMessageCompanions.Show()
-			ElseIf iMessage == 3
-				FollowerDismissMessageCompanionsMale.Show()
-			ElseIf iMessage == 4
-				FollowerDismissMessageCompanionsFemale.Show()
-			ElseIf iMessage == 5
-				FollowerDismissMessageWait.Show()
-			ElseIf iMessage == 404
-				;Do nothing
-			Else
-				;failsafe
-				FollowerDismissMessage.Show()
-			EndIf
-			pFollowerAlias.UnregisterForUpdateGameTime() 	
-			DismissedFollowerActor.StopCombatAlarm()
-			DismissedFollowerActor.AddToFaction(pDismissedFollower)
-			DismissedFollowerActor.SetPlayerTeammate(false)
-			DismissedFollowerActor.RemoveFromFaction(pCurrentHireling)
-			DismissedFollowerActor.SetActorValue("WaitingForPlayer", 0)	
 
-			; PATCH 1.9: 77615: remove unplayable hunting bow when follower is dismissed
-			DismissedFollowerActor.RemoveItem(FollowerHuntingBow, 999, true)
-			DismissedFollowerActor.RemoveItem(FollowerIronArrow, 999, true)
-			; END Patch 1.9 fix
+	if(DismissedFollowerActor)
+		actor refActor1 = pFollowerAlias.GetReference() as actor
+		actor refActor2 = pFollowerAlias2.GetReference() as actor
+		actor refActor3 = pFollowerAlias3.GetReference() as actor
 
-			;hireling rehire function
-			HirelingRehireScript.DismissHireling(DismissedFollowerActor.GetActorBase())
-			If iSayLine == 1
-				iFollowerDismiss = 1
-				DismissedFollowerActor.EvaluatePackage()
-				;Wait for follower to say line
-				Utility.Wait(2)
-			EndIf
-			pFollowerAlias.Clear()
-			iFollowerDismiss = 0
-				;don't set count to 0 if Companions have replaced follower
-			If iMessage == 2
-				;do nothing
-			Else
-				pPlayerFollowerCount.Mod(-count)				
-				iCount -=1
-				if(iCount < 1 )
-					pPlayerFollowerCount.SetValue(0)
-					iCount = 0
-				else
-					pPlayerFollowerCount.Mod(iCount)
-				endIf
-				; if(notif == 1)
-					; debug.notification(iCount + "/3 followers")					
-					; ;debug.notification("PlayerFollowerCount has been set to " + iCount + ".")	
-				; endIf
-			EndIf
-		EndIf
-		;wait then try to refill pFollowerAlias
-		if(refActor2 != none)
-			Utility.Wait(1)
-			pFollowerAlias2.Clear()
-			pFollowerAlias.ForceRefTo(refActor2)
-			pFollowerAlias2.UnregisterForUpdateGameTime()	
-			;if(notif == 1)
-				;debug.notification("Follower1 alias cleared and replaced by Follower2 alias.")
-			;endIf
-		elseIf(refActor3 != none)
-			Utility.Wait(1)
-			pFollowerAlias3.Clear()
-			pFollowerAlias.ForceRefTo(refActor3)
-			pFollowerAlias3.UnregisterForUpdateGameTime() 
-			;if(notif == 1)
-				;debug.notification("Follower1 alias cleared and replaced by Follower3 alias.")
-			;endIf
-		else
-			;if(notif == 1)
-				;debug.notification("Follower1 alias cleared.")
-			;endIf
+		;float notif = gNotif.GetValue()
+		float count = pPlayerFollowerCount.GetValue()
+		float ignoreCheck = gFriendAgg.GetValue()
+		int iCount
+		if (refActor1)
+		iCount += 1
 		endIf
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;alias2
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	elseIf(DismissedFollowerActor == refActor2)
-		If (refActor2.IsDead() == False)
+		if (refActor2)
+		iCount += 1
+		endIf
+		if (refActor3)
+		iCount += 1
+		endIf
+		if(ignoreCheck == 1)
+			DismissedFollowerActor.IgnoreFriendlyHits(false)
+		endIf
+		If (DismissedFollowerActor.IsDead() == False)
 			If iMessage == 0
 				FollowerDismissMessage.Show()
 			ElseIf iMessage == 1
@@ -855,7 +676,7 @@ Function LarsepanDismissFollower(Int iMessage = 0, Int iSayLine = 1, ObjectRefer
 				;failsafe
 				FollowerDismissMessage.Show()
 			EndIf
-			pFollowerAlias2.UnregisterForUpdateGameTime() 
+			
 			DismissedFollowerActor.StopCombatAlarm()
 			DismissedFollowerActor.AddToFaction(pDismissedFollower)
 			DismissedFollowerActor.SetPlayerTeammate(false)
@@ -874,101 +695,70 @@ Function LarsepanDismissFollower(Int iMessage = 0, Int iSayLine = 1, ObjectRefer
 				DismissedFollowerActor.EvaluatePackage()
 				;Wait for follower to say line
 				Utility.Wait(2)
-			EndIf
-			pFollowerAlias2.Clear()	
-				;if(notif == 1)
-					;debug.notification("Follower2 alias cleared.")
-				;endIf	
+			EndIf		
+			
+			;match actor with alias
+			if(DismissedFollowerActor == refActor1)
+				pFollowerAlias.UnregisterForUpdateGameTime()
+				pFollowerAlias.Clear()
+				;If possible, refill that first alias
+				if(refActor2 != none)
+					Utility.Wait(1)
+					pFollowerAlias2.Clear()
+					pFollowerAlias.ForceRefTo(refActor2)
+					pFollowerAlias2.UnregisterForUpdateGameTime() 	
+					;if(notif == 1)
+						;debug.notification("Follower1 alias cleared and replaced by Follower2 alias.")
+					;endIf
+					LarsepanCorrectFollowers()
+				elseIf(refActor3 != none)
+					Utility.Wait(1)
+					pFollowerAlias3.Clear()
+					pFollowerAlias.ForceRefTo(refActor3)
+					pFollowerAlias3.UnregisterForUpdateGameTime() 	
+					;if(notif == 1)
+						;debug.notification("Follower1 alias cleared and replaced by Follower3 alias.")
+					;endIf
+					LarsepanCorrectFollowers()
+				else
+					;the player has no followers
+				endIf
+			elseIf(DismissedFollowerActor == refActor2)
+				pFollowerAlias2.UnregisterForUpdateGameTime() 
+				pFollowerAlias2.Clear()
+			elseIf(DismissedFollowerActor == refActor3)
+				pFollowerAlias3.UnregisterForUpdateGameTime() 
+				pFollowerAlias3.Clear()
+			else
+				; if(notif == 1)
+					; debug.notification("Error.  This actor has no alias match.")
+				; endIf			
+			endIf
+			
 			iFollowerDismiss = 0
-				;don't set count to 0 if Companions have replaced follower
+
 			If iMessage == 2
-				;do nothing
-			Else
+				;don't adjust count if Companions have replaced follower
+			else
 				pPlayerFollowerCount.Mod(-count)				
 				iCount -=1
 				if(iCount < 1 )
-					pPlayerFollowerCount.SetValue(0)
+					pPlayerFollowerCount.SetValue(0) ;might as well reset the zero value
 					iCount = 0
 				else
 					pPlayerFollowerCount.Mod(iCount)
 				endIf
 				; if(notif == 1)
-					; debug.notification(iCount + "/3 followers")					
+					; debug.notification(iCount + "/3 followers")				
 					; ;debug.notification("PlayerFollowerCount has been set to " + iCount + ".")	
 				; endIf
 			EndIf
-		EndIf
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;alias3
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	elseIf(DismissedFollowerActor == refActor3)
-		If (refActor3.IsDead() == False)
-			If iMessage == 0
-				FollowerDismissMessage.Show()
-			ElseIf iMessage == 1
-				FollowerDismissMessageWedding.Show()
-			ElseIf iMessage == 2
-				FollowerDismissMessageCompanions.Show()
-			ElseIf iMessage == 3
-				FollowerDismissMessageCompanionsMale.Show()
-			ElseIf iMessage == 4
-				FollowerDismissMessageCompanionsFemale.Show()
-			ElseIf iMessage == 5
-				FollowerDismissMessageWait.Show()
-			ElseIf iMessage == 404
-				;Do nothing
-			Else
-				;failsafe
-				FollowerDismissMessage.Show()
-			EndIf
-			pFollowerAlias3.UnregisterForUpdateGameTime()
-			DismissedFollowerActor.StopCombatAlarm()
-			DismissedFollowerActor.AddToFaction(pDismissedFollower)
-			DismissedFollowerActor.SetPlayerTeammate(false)
-			DismissedFollowerActor.RemoveFromFaction(pCurrentHireling)
-			DismissedFollowerActor.SetActorValue("WaitingForPlayer", 0)	
-
-			; PATCH 1.9: 77615: remove unplayable hunting bow when follower is dismissed
-			DismissedFollowerActor.RemoveItem(FollowerHuntingBow, 999, true)
-			DismissedFollowerActor.RemoveItem(FollowerIronArrow, 999, true)
-			; END Patch 1.9 fix
-
-			;hireling rehire function
-			HirelingRehireScript.DismissHireling(DismissedFollowerActor.GetActorBase())
-			If iSayLine == 1
-				iFollowerDismiss = 1
-				DismissedFollowerActor.EvaluatePackage()
-				;Wait for follower to say line
-				Utility.Wait(2)
-			EndIf
-			pFollowerAlias3.Clear()
-				;if(notif == 1)
-					;debug.notification("Follower3 alias cleared.")
-				;endIf
-			iFollowerDismiss = 0
-				;don't set count to 0 if Companions have replaced follower
-			If iMessage == 2
-				;do nothing
-			Else
-				pPlayerFollowerCount.Mod(-count)				
-				iCount -=1
-				if(iCount < 1 )
-					pPlayerFollowerCount.SetValue(0)
-					iCount = 0
-				else
-					pPlayerFollowerCount.Mod(iCount)
-				endIf
-				; if(notif == 1)
-					; debug.notification(iCount + "/3 followers")					
-					; ;debug.notification("PlayerFollowerCount has been set to " + iCount + ".")	
-				; endIf
-			EndIf
+			if(ignoreCheck == 1)
+				DismissedFollowerActor.IgnoreFriendlyHits(false)
+			endIf	
 		EndIf
 	else
-		if(notif == 1)
-			debug.notification("Alias error:  This NPC has no follower alias match.")
-		endIf
+		;debug.notification("Player has no followers to dismiss.")
 	endIf
 	
 EndFunction
@@ -987,25 +777,21 @@ Function DismissAnimal()
 	actor refActor2 = pAnimalAlias2.GetReference() as actor
 	actor refActor3 = pAnimalAlias3.GetReference() as actor
 	actor DismissedAnimalActor
-	float notif = gNotif.GetValue()
+	;float notif = gNotif.GetValue()
 	float count = pPlayerAnimalCount.GetValue()
 	float ignoreCheck = gFriendAgg.GetValue()
 	int iCount
-	if (refActor1 != none)
-	iCount += 1
+	
+	if (refActor3)
+		iCount += 1
 	endIf
-	if (refActor2 != none)
-	iCount += 1
+	if (refActor2)
+		iCount += 1
 	endIf
-	if (refActor3 != none)
-	iCount += 1
-	endIf
-	if(notif == 1)
-		debug.notification("Incorrect follower may be dismissed due to default DismissFollower function.")
-	endIf
-	; pAnimalAlias should already be filled, but just in case it isn't...
-	if(refActor1 == none)
-		if(refActor2 != none)
+	if (refActor1)
+		iCount += 1
+	else
+		if(refActor2)
 			pAnimalAlias2.clear()
 			DismissedAnimalActor = refActor2
 			pAnimalAlias.ForceRefTo(refActor2)
@@ -1014,7 +800,7 @@ Function DismissAnimal()
 			;if(notif == 1)
 				;debug.notification("Follower2 alias was moved to Follower1.")
 			;endIf	
-		elseif(refActor3 != none)
+		elseif(refActor3)
 			pAnimalAlias3.clear()
 			DismissedAnimalActor = refActor3
 			pAnimalAlias.ForceRefTo(refActor3)
@@ -1024,96 +810,19 @@ Function DismissAnimal()
 				;debug.notification("Follower3 alias was moved to Follower1.")
 			;endIf
 		else
-			if(notif == 1)
-				debug.notification("Dismissal error: DismissFollower function found no actor for dismissal.")
-			endIf
+			; if(notif == 1)
+				; debug.notification("Dismissal error: DismissFollower function found no actor for dismissal.")
+			; endIf
 			Return
 		endIf
 	endIf
 
-	If pAnimalAlias && pAnimalAlias.GetActorReference().IsDead() == False
-		;actor DismissedAnimalActor = pAnimalAlias.GetReference() as Actor
-		pAnimalAlias.UnregisterForUpdateGameTime() 
-		DismissedAnimalActor.SetActorValue("Variable04", 0)
-		;DismissedAnimalActor.AllowPCDialogue(False)
-		pPlayerAnimalCount.Mod(-count)
-		iCount -=1
-		if(iCount < 0)
-			pPlayerAnimalCount.SetValue(0)
-			iCount = 0
-		else
-			pPlayerAnimalCount.Mod(iCount)
-		endIf
-		; if(notif == 1)
-			; debug.notification(iCount + "/3 animals")				
-			; ;debug.notification("PlayerAnimalCount has been set to " + iCount + ".")	
-		; endIf
-		pAnimalAlias.Clear()
-		AnimalDismissMessage.Show()
-	EndIf
-	if(refActor2 != none)
-		Utility.Wait(1)
-		pAnimalAlias2.Clear()
-		pAnimalAlias.ForceRefTo(refActor2)
-		pAnimalAlias2.UnregisterForUpdateGameTime() 
-		;if(notif == 1)
-			;debug.notification("Animal1 alias cleared and replaced by Animal2 alias.")
-		;endIf
-		LarsepanCorrectAnimals()
-	elseIf(refActor3 != none)
-		Utility.Wait(1)
-		pAnimalAlias3.Clear()
-		pAnimalAlias.ForceRefTo(refActor3)
-		pAnimalAlias3.UnregisterForUpdateGameTime() 
-		;if(notif == 1)
-			;debug.notification("Animal1 alias cleared and replaced by Animal2 alias.")
-		;endIf
-		LarsepanCorrectAnimals()
-	else
-		;if(notif == 1)
-			;debug.notification("Animal1 alias cleared.")
-		;endIf
-	endIf
-	if(ignoreCheck == 1)
-		DismissedAnimalActor.IgnoreFriendlyHits(false)
-	endIf
-	
-EndFunction
-
-Function LarsepanDismissAnimal(ObjectReference FollowerRef)
-
-	actor refActor1 = pAnimalAlias.GetReference() as actor
-	actor refActor2 = pAnimalAlias2.GetReference() as actor
-	actor refActor3 = pAnimalAlias3.GetReference() as actor
-	actor DismissedAnimalActor = FollowerRef as actor
-	float notif = gNotif.GetValue()
-	float count = pPlayerAnimalCount.GetValue()
-	float ignoreCheck = gFriendAgg.GetValue()
-	int iCount
-	if (refActor1 != none)
-	iCount += 1
-	endIf
-	if (refActor2 != none)
-	iCount += 1
-	endIf
-	if (refActor3 != none)
-	iCount += 1
-	endIf
-	if(ignoreCheck == 1)
-		DismissedAnimalActor.IgnoreFriendlyHits(false)
-	endIf	
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;alias1
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	if(DismissedAnimalActor == refActor1)
-
-		If (refActor1.IsDead() == False)
-			;actor DismissedAnimalActor = pAnimalAlias.GetActorRef() as Actor
+	if(iCount)
+		If pAnimalAlias && pAnimalAlias.GetActorReference().IsDead() == False
+			;actor DismissedAnimalActor = pAnimalAlias.GetReference() as Actor
 			pAnimalAlias.UnregisterForUpdateGameTime() 
 			DismissedAnimalActor.SetActorValue("Variable04", 0)
-			DismissedAnimalActor.SetActorValue("WaitingForPlayer", 0)	
 			;DismissedAnimalActor.AllowPCDialogue(False)
-			;;;;
 			pPlayerAnimalCount.Mod(-count)
 			iCount -=1
 			if(iCount < 0)
@@ -1126,11 +835,15 @@ Function LarsepanDismissAnimal(ObjectReference FollowerRef)
 				; debug.notification(iCount + "/3 animals")				
 				; ;debug.notification("PlayerAnimalCount has been set to " + iCount + ".")	
 			; endIf
-			;;;;
 			pAnimalAlias.Clear()
 			AnimalDismissMessage.Show()
+			if(ignoreCheck == 1)
+				DismissedAnimalActor.IgnoreFriendlyHits(false)
+			endIf
 		EndIf
-		if(refActor2 != none)
+		
+		;if possible, fill first alias
+		if(refActor2)
 			Utility.Wait(1)
 			pAnimalAlias2.Clear()
 			pAnimalAlias.ForceRefTo(refActor2)
@@ -1138,7 +851,8 @@ Function LarsepanDismissAnimal(ObjectReference FollowerRef)
 			;if(notif == 1)
 				;debug.notification("Animal1 alias cleared and replaced by Animal2 alias.")
 			;endIf
-		elseIf(refActor3 != none)
+			LarsepanCorrectAnimals()
+		elseIf(refActor3)
 			Utility.Wait(1)
 			pAnimalAlias3.Clear()
 			pAnimalAlias.ForceRefTo(refActor3)
@@ -1146,19 +860,39 @@ Function LarsepanDismissAnimal(ObjectReference FollowerRef)
 			;if(notif == 1)
 				;debug.notification("Animal1 alias cleared and replaced by Animal2 alias.")
 			;endIf
+			LarsepanCorrectAnimals()
 		else
-			;if(notif == 1)
-				;debug.notification("Animal1 alias cleared.")
-			;endIf
+			;player has dismissed all animals
 		endIf
-		
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;alias2
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	elseIf(DismissedAnimalActor == refActor2)
-		If (refActor2.IsDead() == False)
+	endIf
+	
+EndFunction
+
+Function LarsepanDismissAnimal(ObjectReference FollowerRef)
+
+	actor DismissedAnimalActor = FollowerRef as actor
+	
+	if(DismissedAnimalActor)
+		actor refActor1 = pAnimalAlias.GetReference() as actor
+		actor refActor2 = pAnimalAlias2.GetReference() as actor
+		actor refActor3 = pAnimalAlias3.GetReference() as actor
+
+		;float notif = gNotif.GetValue()
+		float count = pPlayerAnimalCount.GetValue()
+		float ignoreCheck = gFriendAgg.GetValue()
+		int iCount
+		if (refActor1)
+		iCount += 1
+		endIf
+		if (refActor2)
+		iCount += 1
+		endIf
+		if (refActor3)
+		iCount += 1
+		endIf
+
+		If (DismissedAnimalActor.IsDead() == False)
 			;actor DismissedAnimalActor = pAnimalAlias.GetActorRef() as Actor
-			pAnimalAlias2.UnregisterForUpdateGameTime() 
 			DismissedAnimalActor.SetActorValue("Variable04", 0)
 			DismissedAnimalActor.SetActorValue("WaitingForPlayer", 0)	
 			;DismissedAnimalActor.AllowPCDialogue(False)
@@ -1176,133 +910,103 @@ Function LarsepanDismissAnimal(ObjectReference FollowerRef)
 				; ;debug.notification("PlayerAnimalCount has been set to " + iCount + ".")	
 			; endIf
 			;;;;
-			pAnimalAlias2.Clear()
-			AnimalDismissMessage.Show()
-		EndIf
-	
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;alias3
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	elseIf(DismissedAnimalActor == refActor3)
-		If (refActor3.IsDead() == False)
-			;actor DismissedAnimalActor = pAnimalAlias.GetActorRef() as Actor
-			pAnimalAlias3.UnregisterForUpdateGameTime() 
-			DismissedAnimalActor.SetActorValue("Variable04", 0)
-			DismissedAnimalActor.SetActorValue("WaitingForPlayer", 0)	
-			;DismissedAnimalActor.AllowPCDialogue(False)
-			;;;;
-			pPlayerAnimalCount.Mod(-count)
-			iCount -=1
-			if(iCount < 0)
-				pPlayerAnimalCount.SetValue(0)
-				iCount = 0
+			if(DismissedAnimalActor == refActor1)
+				pAnimalAlias.UnregisterForUpdateGameTime() 
+				pAnimalAlias.Clear()		
+				if(refActor2 != none)
+					Utility.Wait(1)
+					pAnimalAlias2.Clear()
+					pAnimalAlias.ForceRefTo(refActor2)
+					pAnimalAlias2.UnregisterForUpdateGameTime() 
+					;if(notif == 1)
+						;debug.notification("Animal1 alias cleared and replaced by Animal2 alias.")
+					;endIf
+				elseIf(refActor3 != none)
+					Utility.Wait(1)
+					pAnimalAlias3.Clear()
+					pAnimalAlias.ForceRefTo(refActor3)
+					pAnimalAlias3.UnregisterForUpdateGameTime() 
+					;if(notif == 1)
+						;debug.notification("Animal1 alias cleared and replaced by Animal2 alias.")
+					;endIf
+				else
+					;player has dismissed all animals
+				endIf			
+			elseIf(DismissedAnimalActor == refActor2)
+				pAnimalAlias2.UnregisterForUpdateGameTime()
+				pAnimalAlias2.Clear()		
+			elseIf(DismissedAnimalActor == refActor3)
+				pAnimalAlias3.UnregisterForUpdateGameTime()
+				pAnimalAlias3.Clear()				
 			else
-				pPlayerAnimalCount.Mod(iCount)
+				;debug.notification("Error:  Actor has no alias match.")			
 			endIf
-			; if(notif == 1)
-				; debug.notification(iCount + "/3 animals")				
-				; ;debug.notification("PlayerAnimalCount has been set to " + iCount + ".")	
-			; endIf
-			;;;;
-			pAnimalAlias3.Clear()
+			
 			AnimalDismissMessage.Show()
+			if(ignoreCheck == 1)
+				DismissedAnimalActor.IgnoreFriendlyHits(false)
+			endIf
 		EndIf
-	else	
-		if(notif == 1)
-			debug.notification("Alias error:  This animal has no alias match.")
-		endIf	
-	
+	else
+		;debug.notification("Player has no animals to dismiss.")		
 	endIf
 
 EndFunction
 
 Function MassLarsepanDismissAnimal(ObjectReference FollowerRef)
 
-	actor refActor1 = pAnimalAlias.GetReference() as actor
-	actor refActor2 = pAnimalAlias2.GetReference() as actor
-	actor refActor3 = pAnimalAlias3.GetReference() as actor
 	actor DismissedAnimalActor = FollowerRef as actor
-	float notif = gNotif.GetValue()
-	float count = pPlayerAnimalCount.GetValue()
-	float ignoreCheck = gFriendAgg.GetValue()
-	int iCount
-	if (refActor1 != none)
-	iCount += 1
-	endIf
-	if (refActor2 != none)
-	iCount += 1
-	endIf
-	if (refActor3 != none)
-	iCount += 1
-	endIf
-	if(ignoreCheck == 1)
-		DismissedAnimalActor.IgnoreFriendlyHits(false)
-	endIf	
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;alias1
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	if(DismissedAnimalActor == refActor1)
-
-		If (refActor1.IsDead() == False)
-			pAnimalAlias.UnregisterForUpdateGameTime() 
-			DismissedAnimalActor.SetActorValue("Variable04", 0)
-			DismissedAnimalActor.SetActorValue("WaitingForPlayer", 0)	
-			pPlayerAnimalCount.Mod(-count)
-			iCount -=1
-			if(iCount < 0)
-				pPlayerAnimalCount.SetValue(0)
-				iCount = 0
-			else
-				pPlayerAnimalCount.Mod(iCount)
-			endIf
-			pAnimalAlias.Clear()
-			;no message needed
-		EndIf
 		
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;alias2
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	elseIf(DismissedAnimalActor == refActor2)
-		If (refActor2.IsDead() == False)
-			pAnimalAlias2.UnregisterForUpdateGameTime() 
-			DismissedAnimalActor.SetActorValue("Variable04", 0)
-			DismissedAnimalActor.SetActorValue("WaitingForPlayer", 0)	
-			pPlayerAnimalCount.Mod(-count)
-			iCount -=1
-			if(iCount < 0)
-				pPlayerAnimalCount.SetValue(0)
-				iCount = 0
-			else
-				pPlayerAnimalCount.Mod(iCount)
+		if(DismissedAnimalActor)
+			actor refActor1 = pAnimalAlias.GetReference() as actor
+			actor refActor2 = pAnimalAlias2.GetReference() as actor
+			actor refActor3 = pAnimalAlias3.GetReference() as actor
+			float count = pPlayerAnimalCount.GetValue()
+			float ignoreCheck = gFriendAgg.GetValue()
+			int iCount
+			if (refActor1)
+			iCount += 1
 			endIf
-			pAnimalAlias2.Clear()
-			;no message needed
-		EndIf
+			if (refActor2)
+			iCount += 1
+			endIf
+			if (refActor3)
+			iCount += 1
+			endIf
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;alias3
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	elseIf(DismissedAnimalActor == refActor3)
-		If (refActor3.IsDead() == False)
-			pAnimalAlias3.UnregisterForUpdateGameTime() 
-			DismissedAnimalActor.SetActorValue("Variable04", 0)
-			DismissedAnimalActor.SetActorValue("WaitingForPlayer", 0)	
-			pPlayerAnimalCount.Mod(-count)
-			iCount -=1
-			if(iCount < 0)
-				pPlayerAnimalCount.SetValue(0)
-				iCount = 0
-			else
-				pPlayerAnimalCount.Mod(iCount)
-			endIf
-			pAnimalAlias3.Clear()
-			;no message needed
-		EndIf
-	else	
-		if(notif == 1)
-			debug.notification("Alias error:  This animal has no alias match.")
-		endIf	
-	endIf
+			If (DismissedAnimalActor.IsDead() == False)
+				DismissedAnimalActor.SetActorValue("Variable04", 0)
+				DismissedAnimalActor.SetActorValue("WaitingForPlayer", 0)	
+				;;;;
+				pPlayerAnimalCount.Mod(-count)
+				iCount -=1
+				if(iCount < 0)
+					pPlayerAnimalCount.SetValue(0)
+					iCount = 0
+				else
+					pPlayerAnimalCount.Mod(iCount)
+				endIf
+				;;;;
+				if(DismissedAnimalActor == refActor1)
+					pAnimalAlias.UnregisterForUpdateGameTime() 
+					pAnimalAlias.Clear()					
+				elseIf(DismissedAnimalActor == refActor2)
+					pAnimalAlias2.UnregisterForUpdateGameTime()
+					pAnimalAlias2.Clear()		
+				elseIf(DismissedAnimalActor == refActor3)
+					pAnimalAlias3.UnregisterForUpdateGameTime()
+					pAnimalAlias3.Clear()				
+				else
+					;debug.notification("Error:  Actor has no alias match.")			
+				endIf
+				
+				if(ignoreCheck == 1)
+					DismissedAnimalActor.IgnoreFriendlyHits(false)
+				endIf
+			EndIf
+		else
+			;debug.notification("Player has no animals to dismiss.")		
+		endIf
 
 EndFunction
 
