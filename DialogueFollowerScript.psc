@@ -536,14 +536,19 @@ Function DismissFollower(Int iMessage = 0, Int iSayLine = 1)
 				FollowerDismissMessage.Show()
 			ElseIf iMessage == 1
 				FollowerDismissMessageWedding.Show()
-			ElseIf iMessage == 2
+			ElseIf iMessage == 2 ;called by companions quests
 				FollowerDismissMessageCompanions.Show()
-			ElseIf iMessage == 3
+				Return
+			ElseIf iMessage == 3 ;called by companions quests
 				FollowerDismissMessageCompanionsMale.Show()
-			ElseIf iMessage == 4
+				Return
+			ElseIf iMessage == 4 ;called by companions quests
 				FollowerDismissMessageCompanionsFemale.Show()
+				Return
 			ElseIf iMessage == 5
 				FollowerDismissMessageWait.Show()
+			ElseIf iMessage == 404
+				;Do nothing
 			Else
 				;failsafe
 				FollowerDismissMessage.Show()
@@ -662,12 +667,15 @@ Function LarsepanDismissFollower(Int iMessage = 0, Int iSayLine = 1, ObjectRefer
 				FollowerDismissMessage.Show()
 			ElseIf iMessage == 1
 				FollowerDismissMessageWedding.Show()
-			ElseIf iMessage == 2
+			ElseIf iMessage == 2 ;probably won't be used
 				FollowerDismissMessageCompanions.Show()
-			ElseIf iMessage == 3
+				Return
+			ElseIf iMessage == 3 ;probably won't be used
 				FollowerDismissMessageCompanionsMale.Show()
-			ElseIf iMessage == 4
+				Return
+			ElseIf iMessage == 4 ;probably won't be used
 				FollowerDismissMessageCompanionsFemale.Show()
+				Return
 			ElseIf iMessage == 5
 				FollowerDismissMessageWait.Show()
 			ElseIf iMessage == 404

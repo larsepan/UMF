@@ -1203,18 +1203,8 @@ Function SwapFollowers()
 	int count = PlayerFollowerCount.GetValue() as int
 	if (count > 0)
 		;
-		;Below commented out code was internally used in 1.5.2c
-		; if(count > 2)
-			; FollowerScript.DismissFollower(404)
-			; FollowerScript.DismissFollower(404)
-			; FollowerScript.DismissFollower(2)
-		; elseIf(count > 1)
-			; FollowerScript.DismissFollower(404)
-			; FollowerScript.DismissFollower(2)		
-		; else
-			; FollowerScript.DismissFollower(2)		
-		; endIf
-
+		;Any dismiss code that call with an iMessage of 2 will only get the message and no dismissal	
+		FollowerScript.DismissFollower(2)		
 
 		; Because the Dark Brotherhood does its own jimminess instead of 
 		;  using the normal follower system, we have to dismiss manually. 
