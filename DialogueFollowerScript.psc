@@ -138,7 +138,6 @@ Function SetFollower(ObjectReference FollowerRef)
 
 EndFunction
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;SET-ANIMAL edits
@@ -236,7 +235,6 @@ Function SetAnimal(ObjectReference AnimalRef)
 	
 EndFunction
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;FOLLOWER-WAIT - first function is for default with no actor argument
@@ -302,7 +300,6 @@ Function LarsepanFollowerWait(ObjectReference FollowerRef)
 
 EndFunction
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;ANIMAL-WAIT 
@@ -365,7 +362,6 @@ Function LarsepanAnimalWait(ObjectReference FollowerRef)
 	
 EndFunction
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;FOLLOWER-FOLLOW - first function is for default with no actor argument
@@ -424,7 +420,6 @@ Function LarsepanFollowerFollow(ObjectReference FollowerRef)
 
 EndFunction
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;ANIMAL-FOLLOW
@@ -481,7 +476,6 @@ Function LarsepanAnimalFollow(ObjectReference FollowerRef)
 	AnimalActor.SetActorValue("WaitingForPlayer", 0)
 
 EndFunction
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -771,7 +765,6 @@ Function LarsepanDismissFollower(Int iMessage = 0, Int iSayLine = 1, ObjectRefer
 	
 EndFunction
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;DISMISS-ANIMAL edits
@@ -798,6 +791,7 @@ Function DismissAnimal()
 	endIf
 	if (refActor1)
 		iCount += 1
+		DismissedAnimalActor = refActor1					  
 	else
 		if(refActor2)
 			pAnimalAlias2.clear()
