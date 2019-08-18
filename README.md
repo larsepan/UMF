@@ -14,7 +14,15 @@ Happy adventuring,
 
 LOG
 ===============
+2019.8.17 - v1.5.3
+-Improved a few interactions and bugs with the Companions.
+-General bug fixes and code cleanup.
+2019.8.17 - v1.0.2 (USSEP Patch)
+-General bug fixes and code cleanup.
+
 2019.8.3 - v1.5.2b
+-Fixed wedding dismissal bug.
+2019.8.3 - v1.0.1 (USSEP Patch)
 -Fixed wedding dismissal bug.
 
 2019.7.29 - v1.5.2a
