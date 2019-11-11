@@ -15,7 +15,7 @@ Faction Property DismissedFollowerFaction  Auto
 Faction Property Thief Auto
 Faction Property UMFfriendsFaction Auto 
 FormList Property UMFList  Auto
-;GlobalVariable Property gCommand Auto
+GlobalVariable Property gCommandsToggle  Auto
 GlobalVariable Property gConfigSwitch  Auto
 GlobalVariable Property gFolRide Auto
 GlobalVariable Property gIgnore Auto
@@ -33,7 +33,8 @@ ReferenceAlias Property FollowerRef1  Auto
 ReferenceAlias Property FollowerRef2  Auto  
 ReferenceAlias Property FollowerRef3  Auto  
 ReferenceAlias Property TrollFollower1 Auto
-SPELL Property ConfigSpell  Auto  
+SPELL Property ConfigSpell  Auto
+SPELL Property CommandSpell  Auto 
 
 ;STATES
 Bool bNotif = false;
@@ -97,6 +98,7 @@ Event OnPageReset(string page)
 	int checkRide = gFolRide.GetValue() as int
 	int checkSpell = gConfigSwitch.GetValue() as int
 	int checkIgnore = gIgnore.GetValue() as int
+
 	
 	;GLOBAL CHECKS
 	;if(checkLively != bLively)
@@ -281,19 +283,29 @@ Event OnOptionSelect(int option)
 			endIf
 				
 		elseIf (option == spellOID)
-
+			float commands = gCommandsToggle.GetValue()
 			if (checkSpell == 0  && bSpell == false)
 				bSpell = !bSpell
 				SetToggleOptionValue(spellOID, bSpell)
 				gConfigSwitch.SetValue(1)
-				if (PlayerRef.AddSpell(ConfigSpell))
+				if(!commands)
+					if (PlayerRef.AddSpell(ConfigSpell))
+					endIf
+				else
+					if (PlayerRef.AddSpell(CommandSpell))
+					endIf
 				endIf
 				;ShowMessage("UMF Config Spell has been set to... ON", False)
 			elseif (checkSpell == 1  && bSpell == true)
 				bSpell = !bSpell
 				SetToggleOptionValue(spellOID, bSpell)
 				gConfigSwitch.SetValue(0)
-				if (PlayerRef.RemoveSpell(ConfigSpell))
+				if(!commands)
+					if (PlayerRef.RemoveSpell(ConfigSpell))
+					endIf
+				else
+					if (PlayerRef.RemoveSpell(CommandSpell))
+					endIf
 				endIf
 				;ShowMessage("UMF Config Spell has been set to... OFF", False)			
 			else

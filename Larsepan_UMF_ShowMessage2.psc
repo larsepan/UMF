@@ -1,45 +1,26 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; by Larsepan
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Scriptname Larsepan_UMF_ShowMessage1 Extends ActiveMagicEffect
+Scriptname Larsepan_UMF_ShowMessage2 Extends ActiveMagicEffect
+
+;THIS WILL BE THE COMMANDS VERSION OF THIS MENU
 
 ;PROPERTIES
 Actor Property PlayerRef  Auto  
 Faction Property Assassin Auto
-Faction Property DismissedFollowerFaction  Auto
+Faction Property DismissedFollowerFaction  Auto ;will this be used?
 Faction Property Thief Auto
 Faction Property UMFfriendsFaction Auto
-FormList Property UMFList  Auto
+FormList Property UMFList  Auto  ;will this be used?
 GlobalVariable Property gCommandsToggle  Auto
-GlobalVariable Property gFolRide Auto 
-GlobalVariable Property gIgnore Auto
-GlobalVariable Property gLively Auto 
 GlobalVariable Property gNotif  Auto
 GlobalVariable Property pPlayerAnimalCount  Auto   
 GlobalVariable Property pPlayerFollowerCount  Auto
 Keyword Property vampire Auto
-Message Property UMFConfigMain  Auto  
-Message Property UMFConfigSubA1  Auto   
 Message Property UMFConfigSubD1  Auto 
-Message Property UMFConfigSubD2  Auto
-Message Property UMFConfigSubD3  Auto 
-Message Property UMFConfigSubD4  Auto 
-Message Property UMFConfigSubD5  Auto 
-Message Property UMFConfigSubD6  Auto 
-Message Property UMFConfigSubD7  Auto  
-Message Property UMFConfigSubD8  Auto 
-Message Property UMFConfigSubD9  Auto 
-Message Property UMFConfigSubD10  Auto 
-Message Property UMFConfigSubD11  Auto 
-Message Property UMFConfigSubD12  Auto 
-Message Property UMFConfigSubB1  Auto 
-Message Property UMFConfigSubC1  Auto
-Message Property UMFConfigSubE1  Auto
-Message Property UMFConfigSubE2  Auto
-Message Property UMFInfo  Auto 
-Message Property UMFYesNoMenu1  Auto 
-Message Property UMFYesNoMenu2  Auto 
-Message Property UMFYesNoMenu3  Auto 
+Message Property UMFConfigSubC2  Auto 
+Message Property UMFConfigSubE3  Auto ;Shows CommandMenu toggle status.  I might include further options here in the future.
+Message Property UMFYesNoMenu4  Auto  
 quest Property DLC1RadiantQuest  Auto
 quest Property pDialogueFollower  Auto
 ReferenceAlias Property AnimalRef1  Auto  
@@ -48,626 +29,73 @@ ReferenceAlias Property AnimalRef3  Auto
 ReferenceAlias Property FollowerRef1  Auto  
 ReferenceAlias Property FollowerRef2  Auto  
 ReferenceAlias Property FollowerRef3  Auto 
-ReferenceAlias Property TrollFollower1 Auto
-SPELL Property CommandSpell  Auto  
+ReferenceAlias Property TrollFollower1 Auto	  
 SPELL Property ConfigSpell  Auto 
+SPELL Property CommandSpell  Auto  
 
 ;CHECK FOR PLAYER ON EFFECT START
 Event OnEffectStart(actor akTarget, actor akCaster)
 
 	If akCaster == PlayerRef 
-		Menu()
+		CommandsMenu()
 	EndIf
 	
 EndEvent
 
-;MAIN MENU
-Function Menu (Int aiButton = 0)
+;COMMANDS MAIN MENU
+Function CommandsMenu(Int aiButton = 0)
 
-	aiButton = UMFConfigMain.Show() 	
-	;if aiButton == 0  ;this was an earlier possible left exit idea
+	aiButton = UMFConfigSubC2.Show()	;SubC1 is the original commands menu alias
+	If aiButton == 0 ; Exit
 		;Debug.Notification("Exiting...")	
-	If aiButton == 0  ; Commands
-		SubMenu3()	
-	ElseIf aiButton == 1  ; Options
-		OptionsMenu1()			
-	ElseIf aiButton == 2 ; Exit
-		;Debug.Notification("Exiting...")
-	EndIf	
-
-EndFunction
-
-;OPTIONS
-Function OptionsMenu1(Int aiButton = 0)
-
-	aiButton = UMFConfigSubA1.Show() 	
-	If aiButton == 0 ; back
-		menu()	
-	elseIf aiButton == 1 ;Follower Options
-		SubMenu1()
-	elseIf aiButton == 2 ;Help	
-		SubMenu2()
-	elseIf aiButton == 3 ;Menu Settings
-		MenuSettings()
-		;SetNotification()
-		;OptionsMenu1()			
-	elseIf aiButton == 4 ; Exit
-		;Debug.Notification("Exiting...")
-	EndIf			
-
-EndFunction
-
-;MENU SETTINGS
-Function MenuSettings(Int aiButton = 0)
-	float commands = gCommandsToggle.GetValue()
-	float notif = gNotif.GetValue()
- 
-	If(commands)
-		Debug.Notification("Error.  Global CommandsToggle was in ON status.  Fixing.")
-		gCommandsToggle.SetValue(0)
-	endIf
-	If(notif) ;a probably unnecessary fix
-		If(notif != 1)
-			If(notif < 0.5)
-				gNotif.SetValue(0)
-			Else
-				gNotif.SetValue(1)
-			EndIf
-		EndIf
-	EndIf
-	If(!notif)
-		aiButton = UMFConfigSubE1.Show()
-		If aiButton == 0 ; back
-			OptionsMenu1()	
-		elseIf aiButton == 1 ; Commands Menu is OFF
-			CommandsToggle()
-		elseIf aiButton == 2 ; Notifications are OFF	
-			SetNotification()
-		elseIf aiButton == 3 ; Exit
-			;Exit		
-		EndIf	
-	Else
-		aiButton = UMFConfigSubE2.Show()
-		If aiButton == 0 ; back
-			OptionsMenu1()	
-		elseIf aiButton == 1 ; Commands Menu is OFF
-			CommandsToggle()
-		elseIf aiButton == 2 ; Notifications are ON	
-			SetNotification()
-		elseIf aiButton == 3 ; Exit
-			;Exit		
-		EndIf	
-	EndIf
-		
-	
-EndFunction
-
-Function CommandsToggle(Int aiButton = 0)
-
-	aiButton = UMFYesNoMenu3.Show() 
-	If aiButton == 0  ; Yes
-		;Remove UMFConfig Spell	
-		;Add CommandsMenu Spell
-		gCommandsToggle.SetValue(1)
-		PlayerRef.AddSpell(CommandSpell)
-		PlayerRef.RemoveSpell(ConfigSpell)
-		;Exit menus		
-	ElseIf aiButton == 1 ; No
-		MenuSettings()
-	EndIf
-
-EndFunction
-
-;FOLLOWER OPTIONS
-Function SubMenu1(Int aiButton = 0)
-
-	int lively = gLively.GetValue() as int
-	int ride = gFolRide.GetValue() as int
-	int friend = gIgnore.GetValue() as int
-	
-	if(friend == 0 && lively == 0 && ride == 0)
-		aiButton = UMFConfigSubD1.Show() 	
-		If aiButton == 0 ; back
-			OptionsMenu1()					
-		elseIf aiButton == 1 ; friendly fire settings	
-			YesNoMenu1()
-		elseIf aiButton == 2 ; lively followers
-			SetLively()
-			SubMenu1()		
-		elseIf aiButton == 3 ; followers ride horse assist
-			SetFollowersRide()	
-			SubMenu1()
-		elseIf aiButton == 4 ; Exit
-			;Debug.Notification("Exiting...")
-		EndIf		
-	elseIf(friend == 1 && lively == 0 && ride == 0)
-		aiButton = UMFConfigSubD2.Show() 	
-		If aiButton == 0 ; back
-			OptionsMenu1()					
-		elseIf aiButton == 1 ; friendly fire settings	
-			SetFollowerAgg()
-			SubMenu1()
-		elseIf aiButton == 2 ; lively followers
-			SetLively()
-			SubMenu1()		
-		elseIf aiButton == 3 ; followers ride horse assist
-			SetFollowersRide()	
-			SubMenu1()
-		elseIf aiButton == 4 ; Exit
-			;Debug.Notification("Exiting...")
-		EndIf			
-	elseIf(friend == 0 && lively == 1 && ride == 0)
-		aiButton = UMFConfigSubD3.Show() 
-		If aiButton == 0 ; back
-			OptionsMenu1()					
-		elseIf aiButton == 1 ; friendly fire settings	
-			YesNoMenu1()
-		elseIf aiButton == 2 ; lively followers
-			SetLively()
-			SubMenu1()		
-		elseIf aiButton == 3 ; followers ride horse assist
-			SetFollowersRide()	
-			SubMenu1()
-		elseIf aiButton == 4 ; Exit
-			;Debug.Notification("Exiting...")	
-		EndIf				
-	elseIf(friend == 0 && lively == 0 && ride == 1)
-		aiButton = UMFConfigSubD4.Show() 	
-		If aiButton == 0 ; back
-			OptionsMenu1()					
-		elseIf aiButton == 1 ; friendly fire settings	
-			YesNoMenu1()
-		elseIf aiButton == 2 ; lively followers
-			SetLively()
-			SubMenu1()		
-		elseIf aiButton == 3 ; followers ride horse assist
-			SetFollowersRide()	
-			SubMenu1()
-		elseIf aiButton == 4 ; Exit
-			;Debug.Notification("Exiting...")	
-		EndIf		
-	elseIf(friend == 1 && lively == 1 && ride == 0)
-		aiButton = UMFConfigSubD5.Show() 	
-		If aiButton == 0 ; back
-			OptionsMenu1()					
-		elseIf aiButton == 1 ; friendly fire settings	
-			SetFollowerAgg()
-			SubMenu1()
-		elseIf aiButton == 2 ; lively followers
-			SetLively()
-			SubMenu1()		
-		elseIf aiButton == 3 ; followers ride horse assist
-			SetFollowersRide()	
-			SubMenu1()
-		elseIf aiButton == 4 ; Exit
-			;Debug.Notification("Exiting...")	
-		EndIf
-	elseIf(friend == 0 && lively == 1 && ride == 1)
-		aiButton = UMFConfigSubD6.Show() 	
-		If aiButton == 0 ; back
-			OptionsMenu1()					
-		elseIf aiButton == 1 ; friendly fire settings	
-			YesNoMenu1()
-		elseIf aiButton == 2 ; lively followers
-			SetLively()
-			SubMenu1()		
-		elseIf aiButton == 3 ; followers ride horse assist
-			SetFollowersRide()	
-			SubMenu1()
-		elseIf aiButton == 4 ; Exit
-			;Debug.Notification("Exiting...")	
-		EndIf		
-	elseIf(friend == 1 && lively == 0 && ride == 1)
-		aiButton = UMFConfigSubD7.Show() 	
-		If aiButton == 0 ; back
-			OptionsMenu1()					
-		elseIf aiButton == 1 ; friendly fire settings	
-			SetFollowerAgg()
-			SubMenu1()
-		elseIf aiButton == 2 ; lively followers
-			SetLively()
-			SubMenu1()		
-		elseIf aiButton == 3 ; followers ride horse assist
-			SetFollowersRide()	
-			SubMenu1()
-		elseIf aiButton == 4 ; Exit
-			;Debug.Notification("Exiting...")	
-		EndIf	
-	elseIf(friend == 1 && lively == 1 && ride == 1)
-		aiButton = UMFConfigSubD8.Show()
-		If aiButton == 0 ; back
-			OptionsMenu1()					
-		elseIf aiButton == 1 ; friendly fire settings	
-			SetFollowerAgg()
-			SubMenu1()
-		elseIf aiButton == 2 ; lively followers
-			SetLively()
-			SubMenu1()		
-		elseIf aiButton == 3 ; followers ride horse assist
-			SetFollowersRide()	
-			SubMenu1()
-		elseIf aiButton == 4 ; Exit
-			;Debug.Notification("Exiting...")	
-		EndIf
-	elseIf(friend == 0 && lively == 2 && ride == 0)
-		aiButton = UMFConfigSubD9.Show() 	
-		If aiButton == 0 ; back
-			OptionsMenu1()					
-		elseIf aiButton == 1 ; friendly fire settings	
-			YesNoMenu1()
-		elseIf aiButton == 2 ; lively followers
-			SetLively()
-			SubMenu1()		
-		elseIf aiButton == 3 ; followers ride horse assist
-			SetFollowersRide()	
-			SubMenu1()
-		elseIf aiButton == 4 ; Exit
-			;Debug.Notification("Exiting...")
-		EndIf		
-	elseIf(friend == 1 && lively == 2 && ride == 0)
-		aiButton = UMFConfigSubD10.Show() 	
-		If aiButton == 0 ; back
-			OptionsMenu1()					
-		elseIf aiButton == 1 ; friendly fire settings	
-			SetFollowerAgg()
-			SubMenu1()
-		elseIf aiButton == 2 ; lively followers
-			SetLively()
-			SubMenu1()		
-		elseIf aiButton == 3 ; followers ride horse assist
-			SetFollowersRide()	
-			SubMenu1()
-		elseIf aiButton == 4 ; Exit
-			;Debug.Notification("Exiting...")
-		EndIf						
-	elseIf(friend == 0 && lively == 2 && ride == 1)
-		aiButton = UMFConfigSubD11.Show() 	
-		If aiButton == 0 ; back
-			OptionsMenu1()					
-		elseIf aiButton == 1 ; friendly fire settings	
-			YesNoMenu1()
-		elseIf aiButton == 2 ; lively followers
-			SetLively()
-			SubMenu1()		
-		elseIf aiButton == 3 ; followers ride horse assist
-			SetFollowersRide()	
-			SubMenu1()
-		elseIf aiButton == 4 ; Exit
-			;Debug.Notification("Exiting...")	
-		EndIf				
-	else ;(friend == 1 && lively == 2 && ride == 1)
-		aiButton = UMFConfigSubD12.Show() 	
-		If aiButton == 0 ; back
-			OptionsMenu1()					
-		elseIf aiButton == 1 ; friendly fire settings	
-			SetFollowerAgg()
-			SubMenu1()
-		elseIf aiButton == 2 ; lively followers
-			SetLively()
-			SubMenu1()		
-		elseIf aiButton == 3 ; followers ride horse assist
-			SetFollowersRide()	
-			SubMenu1()
-		elseIf aiButton == 4 ; Exit
-			;Debug.Notification("Exiting...")	
-		EndIf		
-		
-	EndIf
-	
-EndFunction
-
-;FIXES
-Function SubMenu2(Int aiButton = 0)
-
-		aiButton = UMFConfigSubB1.Show() 	
-		If aiButton == 0 ; back
-			OptionsMenu1()	
-		ElseIf aiButton == 1  ; Update/Fix
-			FixFollowers()	
-			SubMenu2()			
-		ElseIf aiButton == 2 ; Clear Followers
-			YesNoMenu2()
-		ElseIf aiButton == 3 ; Info
-			UMFInfo.Show()
-			SubMenu2()
-		ElseIf aiButton == 4 ; Exit
-			;Debug.Notification("Exiting...")	
-		EndIf
-
-EndFunction
-
-;COMMANDS
-Function SubMenu3(Int aiButton = 0)
-
-	aiButton = UMFConfigSubC1.Show()	
-	If aiButton == 0 ; back
-		menu()	
 	elseIf aiButton == 1 ; everyone Wait
 		SetWait()
 	elseIf aiButton == 2 ; everyone Follow
 		SetFollow()
 	elseIf aiButton == 3 ; Stops in-fights, helps followers catch up
 		CheckFollowers()
-	;elseIf aiButton == 3 ; Possible CatchUp function
-	;	CatchUp()
 	elseIf aiButton == 4 ; Dismiss Everyone
 		Dismiss()
-	elseIf aiButton == 5 ; Exit
-		;Debug.Notification("Exiting...")		
+	elseIf aiButton == 5 ; MORE
+		CommandsOptions()
+		;Debug.Notification("To UMF Config menu...")		
 	EndIf	
 
 EndFunction
 
-;IGNORE FRIENDLY YES NO
-Function YesNoMenu1(Int aiButton = 0) ;Are you sure?
+Function CommandsOptions(Int aiButton = 0)
 
-		aiButton = UMFYesNoMenu1.Show() 
-		If aiButton == 0  ; Yes
-			SetFollowerAgg()
-			SubMenu1()			
-		ElseIf aiButton == 1 ; No
-			SubMenu1()	
-		EndIf
-		
+	float commands = gCommandsToggle.GetValue()
+	aiButton = UMFConfigSubE3.Show()	;SubC1 is the original commands menu alias	
+	If(!commands)
+		Debug.Notification("Error.  Global CommandsToggle was in OFF status.  Fixing.")
+		gCommandsToggle.SetValue(1)
+	endIf
+	
+	If aiButton == 0 ; back
+		CommandsMenu()	
+	elseIf aiButton == 1 ; Commands Menu is ON
+		CommandsToggle()
+	elseIf aiButton == 2 ; Exit
+		;Exit		
+	EndIf	
+
 EndFunction
 
-;CLEAR FOLLOWERS YES NO
-Function YesNoMenu2(Int aiButton = 0) ;Are you sure?
+Function CommandsToggle(Int aiButton = 0)
 
-		aiButton = UMFYesNoMenu2.Show() 
-		If aiButton == 0  ; Yes
-			ClearFollowers()
-			SubMenu2()			
-		ElseIf aiButton == 1 ; No
-			SubMenu2()	
-		EndIf
-		
-EndFunction
+	aiButton = UMFYesNoMenu4.Show() 
+	If aiButton == 0  ; Yes
+		;Remove CommandsMenu Spell
+		;Add UMFConfig Spell
+		gCommandsToggle.SetValue(0)
+		PlayerRef.AddSpell(ConfigSpell)
+		PlayerRef.RemoveSpell(CommandSpell)
+		;Exit menus
+	ElseIf aiButton == 1 ; No
+		CommandsOptions()
+	EndIf
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;NON-MENU FUNCTIONS
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Function FixFollowers()
-
-	float zOutF = pPlayerFollowerCount.GetValue()
-	float zOutA = pPlayerAnimalCount.GetValue()
-	actor refActor1 = FollowerRef1.GetReference() as actor
-	actor refActor2 = FollowerRef2.GetReference() as actor
-	actor refActor3 = FollowerRef3.GetReference() as actor
-	actor refAnimal1 = AnimalRef1.GetReference() as actor
-	actor refAnimal2 = AnimalRef2.GetReference() as actor
-	actor refAnimal3 = AnimalRef3.GetReference() as actor
-	actor refTroll1 = TrollFollower1.GetReference() as actor
-	float countF
-	float countA
-	int ifCount
-	int iaCount
-	;int iDistance
-	;int iCatchup
-		
-	;FOLLOWER CHECK
-	if(refActor1 != none)
-		if(refActor1 == refActor2)
-			FollowerRef2.Clear()
-		endIf
-		if(refActor1 == refActor3)
-			FollowerRef3.Clear()
-		endIf
-		ifCount += 1
-		If !(refActor1.IsInFaction(UMFfriendsFaction))
-			refActor1.AddtoFaction(UMFfriendsFaction)
-		endIf
-		UMFList.AddForm(refActor1)
-		; ;REMOVING WAIT DESIGNATION AND MAKING SURE ALL CURRENT FOLLOWERS ARE NEAR THE PLAYER
-		; If (refActor1.GetActorValue("WaitingforPlayer") == 1)
-			; iDistance = refActor1.GetDistance(PlayerRef)
-			; if(iDistance > 512)
-				; Float x = -200.0 * Math.Sin(PlayerRef.GetAngleZ())
-				; Float y = -200.0 * Math.Cos(PlayerRef.GetAngleZ())
-				; Float z = PlayerRef.GetHeight() - 0
-				; refActor1.MoveTo(PlayerRef, x, y, z, true)
-				; iCatchup += 1
-			; endIf
-			; refActor1.SetActorValue("WaitingforPlayer") == 0
-		; endIf
-	endIf
-	refActor2 = FollowerRef2.GetReference() as actor ;update since it might've been cleared
-	if(refActor2 != none)
-		if(refActor2 == refActor3)
-			FollowerRef3.Clear()
-		endIf
-		if(refActor1 == none)
-			FollowerRef2.Clear()
-			FollowerRef1.ForceRefTo(refActor2)
-		endIf
-		ifCount += 1
-		If !(refActor2.IsInFaction(UMFfriendsFaction))
-			refActor2.AddtoFaction(UMFfriendsFaction)
-		endIf
-		UMFList.AddForm(refActor2)
-		; ;REMOVING WAIT DESIGNATION AND MAKING SURE ALL CURRENT FOLLOWERS ARE NEAR THE PLAYER
-		; If (refActor2.GetActorValue("WaitingforPlayer") == 1)
-			; iDistance = refActor2.GetDistance(PlayerRef)
-			; if(iDistance > 512)
-				; Float x = -200.0 * Math.Sin(PlayerRef.GetAngleZ())
-				; Float y = -200.0 * Math.Cos(PlayerRef.GetAngleZ())
-				; Float z = PlayerRef.GetHeight() - 0
-				; refActor2.MoveTo(PlayerRef, x, y, z, true)
-				; iCatchup += 1
-			; endIf
-			; refActor2.SetActorValue("WaitingforPlayer") == 0
-		; endIf
-	endIf
-	refActor3 = FollowerRef3.GetReference() as actor ;update since it might've been cleared
-	if(refActor3 != none)
-		if(refActor1 == none)
-			FollowerRef3.Clear()
-			FollowerRef1.ForceRefTo(refActor3)
-		endIf
-		ifCount += 1
-		If !(refActor3.IsInFaction(UMFfriendsFaction))
-			refActor3.AddtoFaction(UMFfriendsFaction)
-		endIf
-		UMFList.AddForm(refActor3)
-		; ;REMOVING WAIT DESIGNATION AND MAKING SURE ALL CURRENT FOLLOWERS ARE NEAR THE PLAYER
-		; If (refActor3.GetActorValue("WaitingforPlayer") == 1)
-			; iDistance = refActor3.GetDistance(PlayerRef)
-			; if(iDistance > 512)
-				; Float x = -200.0 * Math.Sin(PlayerRef.GetAngleZ())
-				; Float y = -200.0 * Math.Cos(PlayerRef.GetAngleZ())
-				; Float z = PlayerRef.GetHeight() - 0
-				; refActor3.MoveTo(PlayerRef, x, y, z, true)
-				; iCatchup += 1
-			; endIf
-			; refActor3.SetActorValue("WaitingforPlayer") == 0
-		; endIf
-	endIf
-	
-	;ANIMAL CHECK
-	if(refAnimal1 != none)
-		if(refAnimal1 == refAnimal2)
-			AnimalRef2.Clear()
-		endIf
-		if(refAnimal1 == refAnimal3)
-			AnimalRef3.Clear()
-		endIf
-		iaCount += 1
-		If !(refAnimal1.IsInFaction(UMFfriendsFaction))
-			refAnimal1.AddtoFaction(UMFfriendsFaction)
-		endIf
-		UMFList.AddForm(refAnimal1)
-		; ;REMOVING WAIT DESIGNATION AND MAKING SURE ALL CURRENT FOLLOWERS ARE NEAR THE PLAYER
-		; If (refAnimal1.GetActorValue("WaitingforPlayer") == 1)
-			; iDistance = refAnimal1.GetDistance(PlayerRef)
-			; if(iDistance > 512)
-				; Float x = -200.0 * Math.Sin(PlayerRef.GetAngleZ())
-				; Float y = -200.0 * Math.Cos(PlayerRef.GetAngleZ())
-				; Float z = PlayerRef.GetHeight() - 0
-				; refAnimal1.MoveTo(PlayerRef, x, y, z, true)
-				; iCatchup += 1
-			; endIf
-			; refAnimal1.SetActorValue("WaitingforPlayer") == 0
-		; endIf
-	endIf
-	refAnimal2 = AnimalRef2.GetReference() as actor ;update since it might've been cleared
-	if(refAnimal2 != none)
-		if(refAnimal2 == refAnimal3)
-			AnimalRef3.Clear()
-		endIf
-		if(refAnimal1 == none)
-			AnimalRef2.Clear()
-			AnimalRef1.ForceRefTo(refAnimal2)
-		endIf
-		iaCount += 1
-		If !(refAnimal2.IsInFaction(UMFfriendsFaction))
-			refAnimal2.AddtoFaction(UMFfriendsFaction)
-		endIf
-		UMFList.AddForm(refAnimal2)
-		; ;REMOVING WAIT DESIGNATION AND MAKING SURE ALL CURRENT FOLLOWERS ARE NEAR THE PLAYER
-		; If (refAnimal2.GetActorValue("WaitingforPlayer") == 1)
-			; iDistance = refAnimal2.GetDistance(PlayerRef)
-			; if(iDistance > 512)
-				; Float x = -200.0 * Math.Sin(PlayerRef.GetAngleZ())
-				; Float y = -200.0 * Math.Cos(PlayerRef.GetAngleZ())
-				; Float z = PlayerRef.GetHeight() - 0
-				; refAnimal2.MoveTo(PlayerRef, x, y, z, true)
-				; iCatchup += 1
-			; endIf
-			; refAnimal2.SetActorValue("WaitingforPlayer") == 0
-		; endIf
-	endIf
-	refAnimal3 = AnimalRef3.GetReference() as actor ;update since it might've been cleared
-	if(refAnimal3 != none)
-		if(refAnimal1 == none)
-			AnimalRef3.Clear()
-			AnimalRef1.ForceRefTo(refAnimal3)
-		endIf
-		iaCount += 1
-		If !(refAnimal3.IsInFaction(UMFfriendsFaction))
-			refAnimal3.AddtoFaction(UMFfriendsFaction)
-		endIf
-		UMFList.AddForm(refAnimal3)
-		; ;REMOVING WAIT DESIGNATION AND MAKING SURE ALL CURRENT FOLLOWERS ARE NEAR THE PLAYER
-		; If (refAnimal3.GetActorValue("WaitingforPlayer") == 1)
-			; iDistance = refAnimal3.GetDistance(PlayerRef)
-			; if(iDistance > 512)
-				; Float x = -200.0 * Math.Sin(PlayerRef.GetAngleZ())
-				; Float y = -200.0 * Math.Cos(PlayerRef.GetAngleZ())
-				; Float z = PlayerRef.GetHeight() - 0
-				; refAnimal3.MoveTo(PlayerRef, x, y, z, true)
-				; iCatchup += 1
-			; endIf
-			; refAnimal3.SetActorValue("WaitingforPlayer") == 0
-		; endIf
-	endIf
-	; if(refTroll1 != none)
-		; ;REMOVING WAIT DESIGNATION AND MAKING SURE ALL CURRENT FOLLOWERS ARE NEAR THE PLAYER
-		; If (refTroll1.GetActorValue("WaitingforPlayer") == 1)
-			; iDistance = refTroll1.GetDistance(PlayerRef)
-			; if(iDistance > 512)
-				; Float x = -200.0 * Math.Sin(PlayerRef.GetAngleZ())
-				; Float y = -200.0 * Math.Cos(PlayerRef.GetAngleZ())
-				; Float z = PlayerRef.GetHeight() - 0
-				; refTroll1.MoveTo(PlayerRef, x, y, z, true)
-				; iCatchup += 1
-			; endIf
-			; refTroll1.SetActorValue("WaitingforPlayer") == 0
-		; endIf
-	; endIf
-	
-	;SET GLOBALS IF NECESSARY
-	countF = ifCount as float
-	countA = iaCount as float
-	if(zOutF != countF)
-		pPlayerFollowerCount.SetValue(ifCount)
-	endIf
-	if(zOutA != countA)
-		pPlayerAnimalCount.SetValue(iaCount)
-	endIf
-	if(!ifCount && !iaCount && !refTroll1)
-		;there are no followers so no need for notification
-	elseIf(!ifCount && !iaCount && refTroll1)
-		debug.notification("UMF has registered 1 troll.")
-	elseIf(!refTroll1)
-		if(ifCount != 1 && !iaCount)
-			debug.notification("UMF has registered " + ifCount + " followers.")			
-		elseIf(ifCount == 1 && !iaCount)
-			debug.notification("UMF has registered " + ifCount + " follower.")			
-		elseIf(!ifCount && iaCount != 1)
-			debug.notification("UMF has registered " + iaCount + " animals.")			
-		elseIf(!ifCount && iaCount == 1)
-			debug.notification("UMF has registered " + iaCount + " animal.")					
-		elseIf(ifCount != 1 && iaCount != 1)
-			debug.notification("UMF has registered " + ifCount + " followers and " + iaCount + " animals.")
-		elseIf(ifCount == 1 && iaCount != 1)
-			debug.notification("UMF has registered " + ifCount + " follower and " + iaCount + " animals.")
-		elseIf(ifCount != 1 && iaCount == 1)
-			debug.notification("UMF has registered " + ifCount + " followers and " + iaCount + " animal.")
-		else
-			debug.notification("UMF has registered " + ifCount + " follower and " + iaCount + " animal.")	
-		endIf
-	else
-		if(ifCount != 1 && !iaCount)
-			debug.notification("UMF has registered " + ifCount + " followers and 1 troll.")			
-		elseIf(ifCount == 1 && !iaCount)
-			debug.notification("UMF has registered " + ifCount + " follower and 1 troll.")			
-		elseIf(!ifCount && iaCount != 1)
-			debug.notification("UMF has registered " + iaCount + " animals and 1 troll.")			
-		elseIf(!ifCount && iaCount == 1)
-			debug.notification("UMF has registered " + iaCount + " animal and 1 troll.")	
-		elseIf(ifCount != 1 && iaCount != 1)
-			debug.notification("UMF has registered " + ifCount + " followers, " + iaCount + " animals, and 1 troll.")
-		elseIf(ifCount == 1 && iaCount != 1)
-			debug.notification("UMF has registered " + ifCount + " follower, " + iaCount + " animals, and 1 troll.")
-		elseIf(ifCount != 1 && iaCount == 1)
-			debug.notification("UMF has registered " + ifCount + " followers, " + iaCount + " animal, and 1 troll.")
-		else
-			debug.notification("UMF has registered " + ifCount + " follower, " + iaCount + " animal, and 1 troll.")	
-		endIf	
-	endIf
-	Int iIndex = UMFList.GetSize()
-	debug.notification("UMF is managing " + iIndex + " followers.")
-	
 EndFunction
 
 Function CheckFollowers()
@@ -1031,117 +459,6 @@ Function Dismiss()
 	
 EndFunction
 
-Function ClearFollowers()
-
-	actor refActor1 = FollowerRef1.GetReference() as actor
-	actor refActor2 = FollowerRef2.GetReference() as actor
-	actor refActor3 = FollowerRef3.GetReference() as actor
-	actor refAnimal1 = AnimalRef1.GetReference() as actor
-	actor refAnimal2 = AnimalRef2.GetReference() as actor
-	actor refAnimal3 = AnimalRef3.GetReference() as actor
-	actor refTroll1 = TrollFollower1.GetReference() as actor
-	float notif = gNotif.GetValue()
-
-	if(refActor3 != none)
-		(pDialogueFollower as DialogueFollowerScript).LarsepanDismissFollower(0, 0, refActor3)
-	endIf
-	if(refActor2 != none)
-		(pDialogueFollower as DialogueFollowerScript).LarsepanDismissFollower(0, 0, refActor2)
-	endIf
-	if(refActor1 != none)
-		(pDialogueFollower as DialogueFollowerScript).LarsepanDismissFollower(0, 0, refActor1)
-	endIf
-	if(refAnimal3 != none)
-		(pDialogueFollower as DialogueFollowerScript).LarsepanDismissAnimal(refAnimal3)
-	endIf
-	if(refAnimal2 != none)
-		(pDialogueFollower as DialogueFollowerScript).LarsepanDismissAnimal(refAnimal2)
-	endIf
-	if(refAnimal1 != none)
-		(pDialogueFollower as DialogueFollowerScript).LarsepanDismissAnimal(refAnimal1)
-	endIf
-	if(refTroll1 != none)
-		(DLC1RadiantQuest as DLC1RadiantScript).TrollDismissed()
-	endIf
-	Int iIndex = UMFList.GetSize()
-	if(iIndex > 0)
-		while iIndex > 0
-			iIndex -=1
-			actor deleteMe = UMFList.GetAt(iIndex) as actor
-			deleteMe.RemoveFromFaction(UMFfriendsFaction)
-			;if(notif == 1)
-				;debug.notification("Removed " + iIndex)
-			;endIf
-		endWhile
-		UMFList.Revert()
-		debug.notification("UMF is no longer managing any followers.")
-	endIf
-	
-EndFunction
-
-Function SetNotification()
-
-	float zOut = gNotif.GetValue()
-	if(zOut == 0)
-		gNotif.Mod(1)
-		Debug.Notification("UMF Notifications have been set to... ON")
-	elseIf(zOut == 1)
-		gNotif.Mod(-zOut)
-		;Debug.Notification("UMF Notifications have been set to... OFF")
-	else
-		gNotif.Mod(-zOut)
-		Debug.Notification("Previous Global Value Error:  Setting UMF Notifications to... OFF")
-	endIf
-
-EndFunction
-
-Function SetFollowersRide()
-
-	float notif = gNotif.GetValue()
-	float zOut = gFolRide.GetValue()
-	if(zOut == 0)
-		gFolRide.Mod(1)
-		if(notif == 1)
-			Debug.Notification("UMF Ride Assistance set to... ON")
-		endIf
-	elseIf(zOut == 1)
-		gFolRide.Mod(-zOut)
-		if(notif == 1)
-			Debug.Notification("UMF Ride Assistance set to... OFF")
-		endIf
-	else
-		gFolRide.Mod(-zOut)
-		Debug.Notification("Previous Global Value Error:  Setting UMF Ride Assistance to... OFF")
-	endIf
-
-EndFunction
-
-Function SetLively()
-
-	float notif = gNotif.GetValue()
-	float zOut = gLively.GetValue()
-	if(zOut == 0)
-		gLively.Mod(1)
-		if(notif == 1)
-			Debug.Notification("UMF Lively Followers set to... ON")
-		endIf
-	elseIf(zOut == 1)
-		gLively.Mod(1)
-		if(notif == 1)
-			Debug.Notification("UMF Lively Followers set to... ON (headgear)")
-			Debug.Notification("Note: Remove headgear at taverns/home for followers to do likewise.")
-		endIf
-	elseIf(zOut == 2)
-		gLively.SetValue(0)
-		if(notif == 1)
-			Debug.Notification("UMF Lively Followers set to... OFF")
-		endIf
-	else
-		gLively.SetValue(0)
-		Debug.Notification("Previous Global Value Error:  Setting UMF Lively Followers to... OFF")
-	endIf
-
-EndFunction
 
 Function SetWait()
 
@@ -1566,73 +883,6 @@ Int Function TrollFollow(Int Check)
 	iCount += iFar ;let's the return know that something happened here		
 	Return iCount
 	
-EndFunction
-
-Function SetFollowerAgg()
-
-	float notif = gNotif.GetValue()
-	int fNum = gIgnore.GetValue() as int
-	actor refActor1 = FollowerRef1.GetReference() as actor
-	actor refActor2 = FollowerRef2.GetReference() as actor
-	actor refActor3 = FollowerRef3.GetReference() as actor
-	actor refAnimal1 = AnimalRef1.GetReference() as actor
-	actor refAnimal2 = AnimalRef2.GetReference() as actor
-	actor refAnimal3 = AnimalRef3.GetReference() as actor
-	actor refTroll1 = TrollFollower1.GetReference() as actor
-	if(fNum == 0)
-		gIgnore.SetValue(1)	
-		if(refActor1 != none)	
-			refActor1.IgnoreFriendlyHits(true)
-		endIf
-		if(refActor2 != none)
-			refActor2.IgnoreFriendlyHits(true)		
-		endIf
-		if(refActor3 != none)		
-			refActor3.IgnoreFriendlyHits(true)	
-		endIf
-		if(refAnimal1 != none)	
-			refAnimal1.IgnoreFriendlyHits(true)	
-		endIf
-		if(refAnimal2 != none)
-			refAnimal2.IgnoreFriendlyHits(true)
-		endIf
-		if(refAnimal3 != none)	
-			refAnimal3.IgnoreFriendlyHits(true)
-		endIf
-		if(refTroll1 != none)
-			refTroll1.IgnoreFriendlyHits(true)	
-		endIf	
-		if(notif == 1)
-			Debug.Notification("UMF Ignore Friendly Fire set to... ON")
-		endIf
-	else
-		gIgnore.SetValue(0)
-		if(refActor1 != none)				
-			refActor1.IgnoreFriendlyHits(false)
-		endIf
-		if(refActor2 != none)
-				refActor2.IgnoreFriendlyHits(false)
-		endIf
-		if(refActor3 != none)		
-				refActor3.IgnoreFriendlyHits(false)
-		endIf
-		if(refAnimal1 != none)
-				refAnimal1.IgnoreFriendlyHits(false)	
-		endIf
-		if(refAnimal2 != none)	
-				refAnimal2.IgnoreFriendlyHits(false)	
-		endIf
-		if(refAnimal3 != none)	
-				refAnimal3.IgnoreFriendlyHits(false)	
-		endIf
-		if(refTroll1 != none)
-				refTroll1.IgnoreFriendlyHits(false)	
-		endIf
-		if(notif == 1)
-			debug.notification("UMF Ignore Friendly Fire set to... OFF.")
-		endIf
-	endIf
-
 EndFunction
 
 Event OnUpdate()

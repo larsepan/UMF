@@ -150,9 +150,6 @@ Function SetAnimal(ObjectReference AnimalRef)
 	actor refActor2 = pAnimalAlias2.GetReference() as actor
 	actor refActor3 = pAnimalAlias3.GetReference() as actor
 	float ignoreCheck = gFriendAgg.GetValue()
-	;actor fol1 = pFollowerAlias.GetReference() as actor
-	;actor fol2 = pFollowerAlias2.GetReference() as actor
-	;actor fol3 = pFollowerAlias3.GetReference() as actor
 	actor AnimalActor = AnimalRef as Actor
 	float count = pPlayerAnimalCount.GetValue()
 	int iCount
@@ -170,42 +167,24 @@ Function SetAnimal(ObjectReference AnimalRef)
 	
 	if(refActor1 == none)
 		pAnimalAlias.ForceRefTo(AnimalActor)
-;		if(notif == 1)
-;			debug.notification("Follower set to Follower1 alias.")
-;		endIf
 		refActor1 = AnimalActor
 	elseIf(refActor2 == none)
 		pAnimalAlias2.ForceRefTo(AnimalActor)
-;		if(notif == 1)
-;			debug.notification("Follower set to Follower2 alias.")
-;		endIf
 		refActor2 = AnimalActor
 	elseIf(refActor3 == none)
 		pAnimalAlias3.ForceRefTo(AnimalActor)
-;		if(notif == 1)
-;			debug.notification("Follower set to Follower3 alias.")
-;		endIf
 		refActor3 = AnimalActor
 	else ;either the count is off or there is a duplicate actor in the aliases
 	
 		LarsepanCorrectAnimals()
 		if(refActor1 == none)
 			pAnimalAlias.ForceRefTo(AnimalActor)
-;			if(notif == 1)
-;				debug.notification("Follower set to Follower1 alias.")
-;			endIf
 			refActor1 = AnimalActor
 		elseIf(refActor2 == none)
 			pAnimalAlias2.ForceRefTo(AnimalActor)
-;			if(notif == 1)
-;				debug.notification("Follower set to Follower2 alias.")
-;			endIf
 			refActor2 = AnimalActor
 		elseIf(refActor3 == none)
 			pAnimalAlias3.ForceRefTo(AnimalActor)
-;			if(notif == 1)
-;				debug.notification("Follower set to Follower3 alias.")
-;			endIf
 		else
 			if(notif == 1)
 				debug.notification("Count Error: You already have three followers.")
@@ -289,7 +268,6 @@ Function LarsepanFollowerWait(ObjectReference FollowerRef)
 	;SetObjectiveDisplayed(10, abforce = true)
 	;follower will wait 3 days
 	
-	;if you tell this actor, in person, to wait, they will wait there indefinitely
 	if(refActor1 == FollowerActor)
 			pFollowerAlias.RegisterForUpdateGameTime(72)
 	elseIf(refActor2 == FollowerActor)
@@ -351,7 +329,6 @@ Function LarsepanAnimalWait(ObjectReference FollowerRef)
 	AnimalActor.SetActorValue("WaitingForPlayer", 1)
 	;SetObjectiveDisplayed(20, abforce = true)
 	
-	;if you tell this actor, in person, to wait, they will wait there indefinitely
 	if(refActor1 == AnimalActor)
 		pAnimalAlias.RegisterForUpdateGameTime(72)
 	elseIf(refActor2 == AnimalActor)
@@ -522,6 +499,7 @@ Function DismissFollower(Int iMessage = 0, Int iSayLine = 1)
 	if(!iDismiss && iCount)
 		DismissedFollowerActor = refActor1
 		;All actors are waiting.  Dismissing first alias.
+		;Note - if player has a generic follower, the first alias is filled
 	endIf
 
 	if(iCount)
@@ -1012,6 +990,7 @@ Function MassLarsepanDismissAnimal(ObjectReference FollowerRef)
 
 EndFunction
 
+;Probably not necessary, but leaving these old correction functions anyway
 Function LarsepanCorrectFollowers()
 
 	float notif = gNotif.GetValue()	
