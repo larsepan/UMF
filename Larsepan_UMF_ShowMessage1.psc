@@ -85,12 +85,12 @@ Function OptionsMenu1(Int aiButton = 0)
 		menu()	
 	elseIf aiButton == 1 ;Follower Options
 		SubMenu1()
-	elseIf aiButton == 2 ;Help	
-		SubMenu2()
-	elseIf aiButton == 3 ;Menu Settings
+	elseIf aiButton == 2 ;Menu Settings
 		MenuSettings()
 		;SetNotification()
-		;OptionsMenu1()			
+		;OptionsMenu1()	
+	elseIf aiButton == 3 ;Help	
+		SubMenu2()	
 	elseIf aiButton == 4 ; Exit
 		;Debug.Notification("Exiting...")
 	EndIf			
@@ -103,7 +103,7 @@ Function MenuSettings(Int aiButton = 0)
 	float notif = gNotif.GetValue()
  
 	If(commands)
-		Debug.Notification("Error.  Global CommandsToggle was in ON status.  Fixing.")
+		;Debug.Notification("Error.  Global CommandsToggle was in ON status.  Fixing.")
 		gCommandsToggle.SetValue(0)
 	endIf
 	If(notif) ;a probably unnecessary fix
@@ -123,6 +123,7 @@ Function MenuSettings(Int aiButton = 0)
 			CommandsToggle()
 		elseIf aiButton == 2 ; Notifications are OFF	
 			SetNotification()
+			MenuSettings()
 		elseIf aiButton == 3 ; Exit
 			;Exit		
 		EndIf	
@@ -134,12 +135,12 @@ Function MenuSettings(Int aiButton = 0)
 			CommandsToggle()
 		elseIf aiButton == 2 ; Notifications are ON	
 			SetNotification()
+			MenuSettings()
 		elseIf aiButton == 3 ; Exit
 			;Exit		
 		EndIf	
 	EndIf
-		
-	
+			
 EndFunction
 
 Function CommandsToggle(Int aiButton = 0)
