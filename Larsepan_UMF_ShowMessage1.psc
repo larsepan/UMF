@@ -471,6 +471,7 @@ Function FixFollowers()
 			; endIf
 			; refActor1.SetActorValue("WaitingforPlayer") == 0
 		; endIf
+		refActor1.EvaluatePackage()
 	endIf
 	refActor2 = FollowerRef2.GetReference() as actor ;update since it might've been cleared
 	if(refActor2 != none)
@@ -498,6 +499,7 @@ Function FixFollowers()
 			; endIf
 			; refActor2.SetActorValue("WaitingforPlayer") == 0
 		; endIf
+		refActor2.EvaluatePackage()
 	endIf
 	refActor3 = FollowerRef3.GetReference() as actor ;update since it might've been cleared
 	if(refActor3 != none)
@@ -522,6 +524,7 @@ Function FixFollowers()
 			; endIf
 			; refActor3.SetActorValue("WaitingforPlayer") == 0
 		; endIf
+		refActor3.EvaluatePackage()
 	endIf
 	
 	;ANIMAL CHECK
@@ -549,6 +552,7 @@ Function FixFollowers()
 			; endIf
 			; refAnimal1.SetActorValue("WaitingforPlayer") == 0
 		; endIf
+		refAnimal1.EvaluatePackage()
 	endIf
 	refAnimal2 = AnimalRef2.GetReference() as actor ;update since it might've been cleared
 	if(refAnimal2 != none)
@@ -576,6 +580,7 @@ Function FixFollowers()
 			; endIf
 			; refAnimal2.SetActorValue("WaitingforPlayer") == 0
 		; endIf
+		refAnimal2.EvaluatePackage()
 	endIf
 	refAnimal3 = AnimalRef3.GetReference() as actor ;update since it might've been cleared
 	if(refAnimal3 != none)
@@ -600,8 +605,10 @@ Function FixFollowers()
 			; endIf
 			; refAnimal3.SetActorValue("WaitingforPlayer") == 0
 		; endIf
+		refAnimal3.EvaluatePackage()
 	endIf
-	; if(refTroll1 != none)
+	if(refTroll1 != none)
+		refTroll1.EvaluatePackage()
 		; ;REMOVING WAIT DESIGNATION AND MAKING SURE ALL CURRENT FOLLOWERS ARE NEAR THE PLAYER
 		; If (refTroll1.GetActorValue("WaitingforPlayer") == 1)
 			; iDistance = refTroll1.GetDistance(PlayerRef)
@@ -614,7 +621,7 @@ Function FixFollowers()
 			; endIf
 			; refTroll1.SetActorValue("WaitingforPlayer") == 0
 		; endIf
-	; endIf
+	endIf
 	
 	;SET GLOBALS IF NECESSARY
 	countF = ifCount as float

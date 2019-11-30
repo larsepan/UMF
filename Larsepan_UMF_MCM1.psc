@@ -1121,6 +1121,7 @@ State Fix_Followers ; TEXT
 				refActor1.AddtoFaction(UMFfriendsFaction)
 			endIf
 			UMFList.AddForm(refActor1)
+			refActor1.EvaluatePackage()
 		endIf
 		refActor2 = FollowerRef2.GetReference() as actor ;update since it might've been cleared
 		if(refActor2 != none)
@@ -1136,6 +1137,7 @@ State Fix_Followers ; TEXT
 				refActor2.AddtoFaction(UMFfriendsFaction)
 			endIf
 			UMFList.AddForm(refActor2)
+			refActor2.EvaluatePackage()
 		endIf
 		refActor3 = FollowerRef3.GetReference() as actor ;update since it might've been cleared
 		if(refActor3 != none)
@@ -1148,6 +1150,7 @@ State Fix_Followers ; TEXT
 				refActor3.AddtoFaction(UMFfriendsFaction)
 			endIf
 			UMFList.AddForm(refActor3)
+			refActor3.EvaluatePackage()
 		endIf
 	
 		;ANIMAL CHECK
@@ -1163,6 +1166,7 @@ State Fix_Followers ; TEXT
 				refAnimal1.AddtoFaction(UMFfriendsFaction)
 			endIf
 			UMFList.AddForm(refAnimal1)
+			refAnimal1.EvaluatePackage()
 		endIf
 		refAnimal2 = AnimalRef2.GetReference() as actor ;update since it might've been cleared
 		if(refAnimal2 != none)
@@ -1178,6 +1182,7 @@ State Fix_Followers ; TEXT
 				refAnimal2.AddtoFaction(UMFfriendsFaction)
 			endIf
 			UMFList.AddForm(refAnimal2)
+			refAnimal2.EvaluatePackage()
 		endIf
 		refAnimal3 = AnimalRef3.GetReference() as actor ;update since it might've been cleared
 		if(refAnimal3 != none)
@@ -1190,6 +1195,10 @@ State Fix_Followers ; TEXT
 				refAnimal3.AddtoFaction(UMFfriendsFaction)
 			endIf
 			UMFList.AddForm(refAnimal3)
+			refAnimal3.EvaluatePackage()
+		endIf
+		if(refTroll1 != none)
+			refTroll1.EvaluatePackage()
 		endIf
 		
 		;SET GLOBALS IF NECESSARY
