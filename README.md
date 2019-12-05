@@ -14,6 +14,16 @@ Happy adventuring,
 
 LOG
 ===============
+2019.12.3 - v1.5.5a
+-Hotfix for relax.
+
+2019.12.2 - v1.5.5
+-Fixed instant travel bug. Followers should now follow through instant travel better.
+
+2019.11.11 - v1.5.4
+-General bug fixes and code cleanup.
+-Added Commands Menu mode for easier use and better immersion.
+
 2019.8.17 - v1.5.3
 -Improved a few interactions and bugs with the Companions.
 -General bug fixes and code cleanup.
